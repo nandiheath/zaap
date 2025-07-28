@@ -10,22 +10,26 @@ dir_path=$(dirname "${BASH_SOURCE[0]}")
 
 source "$dir_path/lib.sh"
 
-case "$1" in
-  --all)
-    manifests_list=$(list_folders manifests/applications/*)
-    ;;
-  --app)
-    if [[ -n "${2:-}" ]]; then
-      manifests_list="manifests/applications/${2}"
-    else
-      echo "Error: --app requires a path argument" >&2
-      exit 1
-    fi
-    ;;
-  *)
-    manifests_list=$(changed_files "manifests")
-    ;;
-esac
+if [[ $# -eq 0 ]]; then
+  manifests_list=$(changed_files "manifests")
+else
+  case "$1" in
+    --all)
+      manifests_list=$(list_folders manifests/applications/*)
+      ;;
+    --app)
+      if [[ -n "${2:-}" ]]; then
+        manifests_list="manifests/applications/${2}"
+      else
+        echo "Error: --app requires a path argument" >&2
+        exit 1
+      fi
+      ;;
+    *)
+      manifests_list=$(changed_files "manifests")
+      ;;
+  esac
+fi
 
 # Load environment variables from config/.env
 if [[ ! -f "$dir_path/../config/.env" ]]; then
