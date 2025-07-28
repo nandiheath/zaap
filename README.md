@@ -20,3 +20,11 @@ which is a lightweight Kubernetes distribution designed for home labs and edge c
 
 
 ### Getting Started
+
+```bash
+cp config/.env.example config/.env
+# Edit config/.env to set your environment variables
+
+./scripts/render.sh --all
+
+```

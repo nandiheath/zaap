@@ -30,7 +30,7 @@ jobs:
           cache: "true"
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
-        run: ./scripts/render-manifests.sh
+        run: ./scripts/render.sh
 
       - name: Commit changes
         run: |
