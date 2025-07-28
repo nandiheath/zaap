@@ -9,8 +9,8 @@ rules:
   - apiGroups:
       - metallb.io
     resources:
-      - servicel2statuses
-      - servicel2statuses/status
+      - service-l2-statuses
+      - service-l2-statuses/status
     verbs:
       - '*'
   - apiGroups:
