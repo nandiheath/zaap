@@ -1,0 +1,29 @@
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app: istio-public-ingressgateway
+    app.kubernetes.io/instance: istio-public-ingressgateway
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: istio-public-ingressgateway
+    app.kubernetes.io/part-of: istio
+    app.kubernetes.io/version: 1.24.5
+    helm.sh/chart: gateway-1.24.5
+    istio: public-ingressgateway
+  name: istio-public-ingressgateway
+  namespace: istio-system
+spec:
+  maxReplicas: 5
+  metrics:
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 80
+          type: Utilization
+      type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: istio-public-ingressgateway

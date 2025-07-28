@@ -1,0 +1,70 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: istio-public-ingressgateway
+    app.kubernetes.io/instance: istio-public-ingressgateway
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: istio-public-ingressgateway
+    app.kubernetes.io/part-of: istio
+    app.kubernetes.io/version: 1.24.5
+    helm.sh/chart: gateway-1.24.5
+    istio: public-ingressgateway
+  name: istio-public-ingressgateway
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      app: istio-public-ingressgateway
+      istio: public-ingressgateway
+  template:
+    metadata:
+      annotations:
+        inject.istio.io/templates: gateway
+        prometheus.io/path: /stats/prometheus
+        prometheus.io/port: "15020"
+        prometheus.io/scrape: "true"
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: istio-public-ingressgateway
+        app.kubernetes.io/instance: istio-public-ingressgateway
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: istio-public-ingressgateway
+        app.kubernetes.io/part-of: istio
+        app.kubernetes.io/version: 1.24.5
+        helm.sh/chart: gateway-1.24.5
+        istio: public-ingressgateway
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+        - env: null
+          image: auto
+          name: istio-proxy
+          ports:
+            - containerPort: 15090
+              name: http-envoy-prom
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 1024Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 1337
+            runAsNonRoot: true
+            runAsUser: 1337
+      securityContext:
+        sysctls:
+          - name: net.ipv4.ip_unprivileged_port_start
+            value: "0"
+      serviceAccountName: istio-public-ingressgateway
+      terminationGracePeriodSeconds: 30

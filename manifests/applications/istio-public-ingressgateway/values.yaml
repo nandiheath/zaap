@@ -1,0 +1,27 @@
+# https://github.com/istio/istio/blob/1.19.1/manifests/charts/gateway/values.yaml
+service:
+  # Changin to ClusterIP as we don't need an external LB to front ingress gateway, we use cloudflared
+  type: LoadBalancer
+  ports:
+    - name: status-port
+      port: 15021
+      protocol: TCP
+      targetPort: 15021
+    - name: http2
+      port: 80
+      protocol: TCP
+      targetPort: 80
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: 443
+  annotations: {}
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  externalTrafficPolicy: ""
+  ipFamilyPolicy: ""
+  ipFamilies: []
+
+name: istio-public-ingressgateway
+labels:
+  istio: public-ingressgateway
