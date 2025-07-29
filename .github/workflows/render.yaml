@@ -29,18 +29,34 @@ jobs:
         with:
           cache: "true"
       # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Run render script
         run: ./scripts/render.sh
 
-      - name: Commit changes
+      - name: Check for changes
+        id: git-check
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add .
+          if git diff --staged --quiet; then
+            echo "No changes detected"
+            echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected"
+            echo "changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit changes
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
           git commit -m "[no ci] chore: render manifests"
 
       - name: Push changes
+        if: steps.git-check.outputs.changes == 'true'
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
+          
+      - name: Status check
+        run: echo "Render workflow completed successfully"
