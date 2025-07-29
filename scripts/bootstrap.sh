@@ -113,6 +113,11 @@ kubectl apply -f artifacts/1password-connect/
 print_info "Applying bootstrap manifests"
 kubectl apply -f artifacts/bootstrap/
 
+
+# Apply the bootstrap manifests
+print_info "Applying bootstrap manifests"
+kubectl apply -f artifacts/bootstrap/
+
 print_info "Bootstrap completed successfully!"
 print_info "You can now access ArgoCD and start deploying applications."
 print_info "For more information, see the README.md file."
