@@ -32,9 +32,9 @@ jobs:
       - name: Run render script
         run: ./scripts/render.sh
         env:
-          ARGOCD_GITHUB_REPO: ${{ env.ARGOCD_GITHUB_REPO }}
-          ARGOCD_GITHUB_ORG: ${{ env.ARGOCD_GITHUB_ORG }}
-          VAULT: ${{ env.VAULT }}
+          ARGOCD_GITHUB_REPO: ${{ vars.ARGOCD_GITHUB_REPO }}
+          ARGOCD_GITHUB_ORG: ${{ vars.ARGOCD_GITHUB_ORG }}
+          VAULT: ${{ vars.VAULT }}
 
       - name: Check for changes
         id: git-check
