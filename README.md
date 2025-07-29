@@ -28,3 +28,6 @@ cp config/.env.example config/.env
 ./scripts/render.sh --all
 
 ```
+
+You should also create corresponding environment variables on your Github repository to match the `.env` file.
+This allows the CI steps to access the necessary secrets and configurations for generating the manifests and deploying them to your Kubernetes cluster.

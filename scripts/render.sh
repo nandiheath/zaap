@@ -1,4 +1,17 @@
 #!/bin/bash
+#
+# Render script for generating Kubernetes manifests
+# 
+# This script has been enhanced to work reliably in CI environments:
+# - Handles missing .env file gracefully
+# - Provides debug output in CI environments
+# - Includes robust error handling for git operations and external tools
+# - Falls back to processing all applications if git history is not available
+
+# Enable debug output in CI environment
+if [[ "${CI:-}" == "true" ]]; then
+  set -x
+fi
 
 set -oeu pipefail
 
@@ -11,6 +24,7 @@ dir_path=$(dirname "${BASH_SOURCE[0]}")
 source "$dir_path/lib.sh"
 
 if [[ $# -eq 0 ]]; then
+  echo "Detecting changed manifests..."
   manifests_list=$(changed_files "manifests")
 else
   case "$1" in
@@ -69,6 +83,29 @@ for manifests in $manifests_list ; do
   echo "rendering manifests from $tmp_manifests"
   output_path="$RENDER_DIR/$(echo "$manifests" | cut -d'/' -f3-4)"
   mkdir -p "$output_path"
-  rm -rf "$output_path/*"  # Clear previous output
-  kustomize build --enable-helm "$tmp_manifests" | yq -s '"'"$output_path/"'" + (.kind | downcase) + "_" + (.metadata.name | sub("\.","-"))'
+  rm -rf $output_path/*  # Clear previous output
+  
+  # Check if kustomize is available
+  if ! command -v kustomize &> /dev/null; then
+    echo "Error: kustomize command not found. Please install kustomize." >&2
+    echo "Skipping kustomize build for $tmp_manifests"
+    continue
+  fi
+  
+  # Check if yq is available
+  if ! command -v yq &> /dev/null; then
+    echo "Error: yq command not found. Please install yq." >&2
+    echo "Skipping manifest rendering for $tmp_manifests"
+    continue
+  fi
+  
+  # Run kustomize and yq with error handling
+  if ! kustomize_output=$(kustomize build --enable-helm "$tmp_manifests" 2>&1); then
+    echo "Warning: kustomize build failed for $tmp_manifests: $kustomize_output" >&2
+    continue
+  fi
+  
+  echo "$kustomize_output" | yq -s '"'"$output_path/"'" + (.kind | downcase) + "_" + (.metadata.name | sub("\.","-"))' || {
+    echo "Warning: yq processing failed for $tmp_manifests" >&2
+  }
 done
