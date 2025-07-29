@@ -16,7 +16,7 @@ spec:
 
   # Source of the application manifests
   source:
-    repoURL: $GITHUB_REPO_URL
+    repoURL: $ARGOCD_GITHUB_REPO
     targetRevision: main
     path: artifacts/argocd-app-of-apps
 
