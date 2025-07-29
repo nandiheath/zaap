@@ -31,14 +31,16 @@ else
   esac
 fi
 
-# Load environment variables from config/.env
-if [[ ! -f "$dir_path/../config/.env" ]]; then
-  echo "Error: config/.env file not found" >&2
-  exit 1
+# Load environment variables from config/.env if it exists
+# In CI environments, .env file might not be present
+if [[ -f "$dir_path/../config/.env" ]]; then
+  echo "Loading environment variables from config/.env"
+  set -a
+  source "$dir_path/../config/.env"
+  set +a
+else
+  echo "Warning: config/.env file not found, continuing without it"
 fi
-set -a
-source "$dir_path/../config/.env"
-set +a
 
 interpolate_manifests() {
   local src_dir="$1"
