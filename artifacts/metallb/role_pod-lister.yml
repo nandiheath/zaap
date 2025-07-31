@@ -78,3 +78,10 @@ rules:
       - get
       - list
       - watch
+  - apiGroups:
+      - metallb.io
+    resources:
+      - servicebgpstatuses
+      - servicebgpstatuses/status
+    verbs:
+      - '*'

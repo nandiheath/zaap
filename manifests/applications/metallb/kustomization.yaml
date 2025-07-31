@@ -5,6 +5,6 @@ namespace: metallb-system
 
 resources:
   # installation of Metallb
-  - github.com/metallb/metallb/config/native?ref=v0.14.9
+  - https://raw.githubusercontent.com/metallb/metallb/v0.15.2/config/manifests/metallb-native.yaml
   - ip-address-pool.yaml
   - advertisement.yaml
