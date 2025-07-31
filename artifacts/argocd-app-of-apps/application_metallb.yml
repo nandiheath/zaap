@@ -8,7 +8,6 @@ metadata:
   namespace: argocd
 spec:
   destination:
-    namespace: metallb-system
     server: https://kubernetes.default.svc
   project: default
   revisionHistoryLimit: 10

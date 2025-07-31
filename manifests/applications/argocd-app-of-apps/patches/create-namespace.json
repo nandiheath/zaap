@@ -1,7 +1,0 @@
-[
-  {
-    "op": "add",
-    "path": "/spec/syncPolicy/syncOptions/-",
-    "value": "CreateNamespace=true"
-  }
-]

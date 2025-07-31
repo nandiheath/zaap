@@ -9,7 +9,6 @@ resources:
   - apps/cloudflared.yaml
   - apps/istio-base.yaml
   - apps/istio-ingressgateway.yaml
-  - apps/istio-public-ingressgateway.yaml
   - apps/istiod.yaml
   - apps/metallb.yaml
     
