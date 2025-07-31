@@ -6,4 +6,4 @@ spec:
   source:
     path: artifacts/metallb
   destination:
-    namespace: metallb
+    namespace: metallb-system
