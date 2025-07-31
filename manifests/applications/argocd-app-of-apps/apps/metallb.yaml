@@ -5,3 +5,5 @@ metadata:
 spec:
   source:
     path: artifacts/metallb
+  destination:
+    namespace: metallb

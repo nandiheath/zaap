@@ -61,7 +61,7 @@ interpolate_manifests() {
   local dst_dir="$2"
   echo "Interpolating environment variables in manifests from $src_dir to $dst_dir"
   # Use envsubst to replace environment variables in YAML files
-  find "$src_dir" -type f -name "*.yaml" -exec sh -c 'rel_path="${1#"$2"/}"; dst="$3/$rel_path"; mkdir -p "$(dirname "$dst")"; envsubst < "$1" > "$dst"' _ {} "$src_dir" "$dst_dir" \;  
+  find "$src_dir" -type f \( -name "*.yaml" -o -name "*.yml" -o -name "*.json" \) -exec sh -c 'rel_path="${1#"$2"/}"; dst="$3/$rel_path"; mkdir -p "$(dirname "$dst")"; envsubst < "$1" > "$dst"' _ {} "$src_dir" "$dst_dir" \;  
 }
 
 cleanup_tmp_manifests() {
