@@ -11,6 +11,7 @@ resources:
   - apps/istio-ingressgateway.yaml
   - apps/istiod.yaml
   - apps/metallb.yaml
+  - apps/cert-manager.yaml
     
 patches:
   - path: base-application.yaml
