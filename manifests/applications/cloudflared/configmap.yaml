@@ -26,5 +26,9 @@ data:
     # from the internet to cloudflared, run `cloudflared tunnel route dns <tunnel> <hostname>`.
     # E.g. `cloudflared tunnel route dns example-tunnel tunnel.example.com`.
     ingress:
-    # Route everything to istio ingress gateway
-    - service: http://istio-ingressgateway.istio-system.svc.cluster.local
+    # Route everything to istio ingress gateway    
+    - service: https://istio-ingressgateway.istio-system.svc.cluster.local
+      hostname: zaap.nandi.sh
+      originalServerName: zaap.nandi.sh
+    # catch-all
+    - service: http_status:404

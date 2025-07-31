@@ -12,6 +12,8 @@ resources:
   - apps/istiod.yaml
   - apps/metallb.yaml
   - apps/cert-manager.yaml
+  - apps/network-configs.yaml
+  - apps/test-app.yaml
     
 patches:
   - path: base-application.yaml

@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: zaap-nandi-sh-cert
+  namespace: istio-system
+spec:
+  dnsNames:
+    - zaap.nandi.sh
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-cloudflare
+  secretName: zaap-nandi-sh-tls
