@@ -3,10 +3,11 @@ kind: Kustomization
 
 resources:
   - telemetry.yaml
+  - namespace.yaml
 
 helmCharts:
 - name: istiod
   repo: https://istio-release.storage.googleapis.com/charts
   releaseName: istiod
   namespace: istio-system
-  version: 1.24.5
+  version: 1.24.5  

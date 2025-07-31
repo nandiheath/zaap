@@ -5,6 +5,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
   name: homelab-lb
+  namespace: metallb-system
 spec:
   addresses:
     - 10.43.10.100-10.43.10.120
