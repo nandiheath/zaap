@@ -15,3 +15,12 @@ helmCharts:
       # https://docs.cilium.io/en/latest/network/servicemesh/istio/
       cni:
         exclusive: false
+      hubble:
+        tls:
+          auto:
+            method: certmanager
+            certValidityDuration: 1095
+            certManagerIssuerRef:
+              group: cert-manager.io
+              kind: ClusterIssuer                
+              name: selfsigned
