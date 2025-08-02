@@ -47,11 +47,17 @@ fi
 
 # Load environment variables from config/.env if it exists
 # In CI environments, .env file might not be present
+ENV_VARS_TO_SUBST=""
 if [[ -f "$dir_path/../config/.env" ]]; then
   echo "Loading environment variables from config/.env"
   set -a
   source "$dir_path/../config/.env"
   set +a
+  
+  # Extract variable names from .env file and format them for envsubst
+  # This will ignore comments and empty lines
+  ENV_VARS_TO_SUBST=$(grep -v '^#' "$dir_path/../config/.env" | grep -v '^$' | sed -E 's/([^=]+)=.*/\${\1}/g' | tr '\n' ' ')
+  echo "Will only substitute the following environment variables: $ENV_VARS_TO_SUBST"
 else
   echo "Warning: config/.env file not found, continuing without it"
 fi
@@ -60,8 +66,8 @@ interpolate_manifests() {
   local src_dir="$1"
   local dst_dir="$2"
   echo "Interpolating environment variables in manifests from $src_dir to $dst_dir"
-  # Use envsubst to replace environment variables in YAML files
-  find "$src_dir" -type f \( -name "*.yaml" -o -name "*.yml" -o -name "*.json" \) -exec sh -c 'rel_path="${1#"$2"/}"; dst="$3/$rel_path"; mkdir -p "$(dirname "$dst")"; envsubst < "$1" > "$dst"' _ {} "$src_dir" "$dst_dir" \;  
+  # Use envsubst to replace only the environment variables defined in .env
+  find "$src_dir" -type f \( -name "*.yaml" -o -name "*.yml" -o -name "*.json" \) -exec sh -c 'rel_path="${1#"$2"/}"; dst="$3/$rel_path"; mkdir -p "$(dirname "$dst")"; envsubst "$4" < "$1" > "$dst"' _ {} "$src_dir" "$dst_dir" "$ENV_VARS_TO_SUBST" \;  
 }
 
 cleanup_tmp_manifests() {

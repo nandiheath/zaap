@@ -1,21 +1,19 @@
----
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: nginx
+  name: argocd-server
+  namespace: argocd
 spec:
+  hosts:
+    - "zaap.nandi.sh"
   gateways:
     - istio-system/ingress-gateway
-  hosts:
-    - zaap.nandi.sh
   http:
     - match:
         - uri:
-            prefix: /test-app
-      rewrite:
-        uri: /
+            prefix: /argocd
       route:
         - destination:
-            host: nginx
+            host: argocd-server.argocd.svc.cluster.local
             port:
               number: 80

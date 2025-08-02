@@ -1,10 +1,18 @@
 ---
 apiVersion: v1
 data:
-  admin.enabled: "true"
+  admin.enabled: "false"
   application.instanceLabelKey: argocd.argoproj.io/instance
   application.sync.impersonation.enabled: "false"
   controller.diff.server.side: "true"
+  dex.config: |
+    connectors:
+    - type: github
+      name: Github
+      id: github
+      config:
+        clientID: Iv1.c4bcc7cfd7caf7f0
+        clientSecret: $argocd-github-app:githubAppClientSecret
   exec.enabled: "false"
   resource.customizations.ignoreResourceUpdates.ConfigMap: |
     jqPathExpressions:
@@ -103,7 +111,7 @@ data:
   statusbadge.enabled: "false"
   timeout.hard.reconciliation: 0s
   timeout.reconciliation: 180s
-  url: https://argocd.example.com
+  url: https://zaap.nandi.sh/argocd
 kind: ConfigMap
 metadata:
   labels:

@@ -17,7 +17,36 @@ configs:
   secret:
     # -- Create the argocd-secret
     createSecret: true
-
+    
+  params:    
+    # all hosts are protected by istio mTLS
+    server.insecure: true
+    
+    server.baseref: /argocd/
+    
+    server.rootpath: /argocd
+  
   cm:
+    url: https://zaap.nandi.sh/argocd
+    
     # Enable server-side diff for Argo CD
     controller.diff.server.side: "true"
+    
+    # enable admin for local admin account
+    admin.enabled: "false"
+    
+    dex.config: |
+      connectors:
+      - type: github
+        name: Github
+        id: github
+        config:
+          clientID: Iv1.c4bcc7cfd7caf7f0
+          clientSecret: $argocd-github-app:githubAppClientSecret
+      
+  rbac:
+    # RBAC configuration - grant admin rights to nandi0315@gmail.com
+    policy.csv: |
+      g, $ARGOCD_ADMIN_GITHUB_USER, role:admin
+    # The scopes to examine during authentication, allow us to specify the admin users
+    scopes: "[email]"

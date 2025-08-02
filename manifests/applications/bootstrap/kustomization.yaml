@@ -5,3 +5,5 @@ resources:
   - clustersecretstore.yaml
   - externalsecret-argocd.yaml
   - application.yaml
+  - namespace-1password.yaml
+  - namespace-argocd.yaml
