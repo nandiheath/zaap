@@ -17,13 +17,3 @@ spec:
             host: argocd-server.argocd.svc.cluster.local
             port:
               number: 80
-    - match:
-        - uri:
-            prefix: /api/dex
-      rewrite:
-        uri: /
-      route:
-        - destination:
-            host: argocd-dex-server
-            port:
-              number: 80
