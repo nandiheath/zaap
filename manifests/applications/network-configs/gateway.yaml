@@ -1,0 +1,17 @@
+# The main gateway for the incoming traffic from cloudflared.
+# Since we are using ambient mode, the mTLS is handled by istio.
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: ingress-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "zaap.nandi.sh"
