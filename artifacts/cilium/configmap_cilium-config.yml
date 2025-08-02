@@ -13,6 +13,7 @@ data:
   bpf-lb-map-max: "65536"
   bpf-lb-mode-annotation: "false"
   bpf-lb-sock: "false"
+  bpf-lb-sock-hostns-only: "true"
   bpf-lb-source-range-all-types: "false"
   bpf-map-dynamic-size-ratio: "0.0025"
   bpf-policy-map-max: "16384"
@@ -26,7 +27,7 @@ data:
   cluster-pool-ipv4-mask-size: "24"
   clustermesh-enable-endpoint-sync: "false"
   clustermesh-enable-mcs-api: "false"
-  cni-exclusive: "true"
+  cni-exclusive: "false"
   cni-log-file: /var/run/cilium/cilium-cni.log
   custom-cni-conf: "false"
   datapath-mode: veth
@@ -57,7 +58,6 @@ data:
   enable-lb-ipam: "true"
   enable-masquerade-to-route-source: "false"
   enable-metrics: "true"
-  enable-node-port: "false"
   enable-node-selector-labels: "false"
   enable-non-default-deny-policies: "true"
   enable-policy: default
@@ -92,7 +92,8 @@ data:
   iptables-random-fully: "false"
   k8s-require-ipv4-pod-cidr: "false"
   k8s-require-ipv6-pod-cidr: "false"
-  kube-proxy-replacement: "false"
+  kube-proxy-replacement: "true"
+  kube-proxy-replacement-healthz-bind-address: ""
   max-connected-clusters: "255"
   mesh-auth-enabled: "true"
   mesh-auth-gc-interval: 5m0s
@@ -108,6 +109,7 @@ data:
   nodes-gc-interval: 5m0s
   operator-api-serve-addr: 127.0.0.1:9234
   operator-prometheus-serve-addr: :9963
+  policy-cidr-match-mode: ""
   policy-default-local-cluster: "false"
   policy-secrets-namespace: cilium-secrets
   policy-secrets-only-from-secrets-namespace: "true"
