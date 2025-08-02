@@ -11,5 +11,7 @@ helmCharts:
       kubeProxyReplacement: true
       socketLB:
         hostNamespaceOnly: true
+      # avoid configuration conflicts with istio ambient mode
+      # https://docs.cilium.io/en/latest/network/servicemesh/istio/
       cni:
         exclusive: false
