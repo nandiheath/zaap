@@ -77,7 +77,7 @@ if [ -z "${DESCRIPTION:-}" ]; then
 fi
 
 # Create directories
-SRC_DIR="manifests/${APP_NAME}/${APP_NAME}"
+SRC_DIR="manifests/applications/${APP_NAME}"
 RENDERED_DIR="artifacts/${APP_NAME}"
 
 echo "Creating application directories..."

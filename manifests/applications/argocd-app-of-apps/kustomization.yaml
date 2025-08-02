@@ -16,7 +16,7 @@ resources:
   - apps/cert-manager.yaml
   - apps/network-configs.yaml
   - apps/test-app.yaml
-    
+  - apps/cilium.yaml    
 patches:
   - path: base-application.yaml
     target:
