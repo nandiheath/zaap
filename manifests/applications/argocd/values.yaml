@@ -28,6 +28,14 @@ configs:
     # enable admin for local admin account
     admin.enabled: "false"
     
+    # Ignore divisor field during diff operations (this is the default value being populated when using server side diff)    
+    resource.customizations.ignoreDifferences.apps_Deployment: |
+      jqPathExpressions:
+      - .spec.template.spec.containers[].env[]?.valueFrom.resourceFieldRef.divisor
+    resource.customizations.ignoreDifferences.apps_DaemonSet: |
+      jqPathExpressions:
+      - .spec.template.spec.containers[].env[]?.valueFrom.resourceFieldRef.divisor
+      
     dex.config: |
       connectors:
       - type: github
