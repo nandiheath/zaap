@@ -17,7 +17,15 @@ configs:
   secret:
     # -- Create the argocd-secret
     createSecret: true
-
+    
+  params:    
+    # all hosts are protected by istio mTLS
+    server.insecure: true
+    
+    server.baseref: /argocd
+    
+    server.rootpath: /argocd
+  
   cm:
     url: https://zaap.nandi.sh/argocd
     
