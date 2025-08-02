@@ -1,5 +1,7 @@
 # Zaap
 
+![zaap-logo.png](zaap-logo.png)
+
 Zaap(集) is a cloud-native setup for a home lab that provides a unified interface to manage various services and applications.
 It is designed to be modular, allowing users to easily add or remove components as needed.
 This is an opinionated setup, meaning it comes with a set of pre-configured services and applications that can be easily deployed and managed.
@@ -11,23 +13,69 @@ which is a lightweight Kubernetes distribution designed for home labs and edge c
 
 ### Stack
 
-| Service           | Description |
-|-------------------|-------------|
-| ArgoCD            | GitOps continuous delivery tool for Kubernetes |
-| External-Secrets  | Kubernetes controller for managing secrets from external sources |
-| 1password-Connect | Connects Kubernetes to 1Password for secret management |
+| Service                | Description |
+|------------------------|-------------|
+| ArgoCD                 | GitOps continuous delivery tool for Kubernetes |
+| External-Secrets       | Kubernetes controller for managing secrets from external sources |
+| 1password-Connect      | Connects Kubernetes to 1Password for secret management |
+| Istio                  | Service mesh providing traffic management, security, and observability |
+| Cert-Manager           | Kubernetes add-on to automate the management of TLS certificates |
+| Cilium                 | CNI for Kubernetes networking with advanced security features |
+| MetalLB                | Load balancer implementation for bare metal Kubernetes clusters |
+| Cloudflared            | Cloudflare Tunnel client for secure external access to the cluster |
+| Bootstrap              | Initial setup components for the cluster |
+| Network-Configs        | Network configuration resources like Gateways and VirtualServices |
 
+### Architecture
 
+The Zaap stack uses several key components working together:
+
+- **Networking**: Cilium provides CNI functionality with kubeProxyReplacement enabled, configured to work with Istio ambient mode.
+- **Service Mesh**: Istio components (base, CNI, ingressgateway, ztunnel, istiod) manage internal and external traffic.
+- **External Access**: Instead of using LoadBalancer services, the setup uses Cloudflare Tunnel (cloudflared) to securely expose services.
+- **Certificate Management**: Cert-Manager handles TLS certificates for secure communications.
+- **Secret Management**: External-Secrets with 1Password Connect allows secure management of secrets.
+- **GitOps Deployment**: ArgoCD manages the deployment of all applications from Git repositories.
+
+![network-diagram.png](network-diagram.png)
 
 ### Getting Started
 
-```bash
-cp config/.env.example config/.env
-# Edit config/.env to set your environment variables
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/nandiheath/zaap.git
+   cd zaap
+   ```
 
-./scripts/render.sh --all
+2. Create and configure the environment file:
+   ```bash
+   # Create .env file if it doesn't exist
+   touch config/.env
+   
+   # Edit the .env file with required variables:
+   # - ARGOCD_GITHUB_REPO: The repository URL for the Zaap project
+   # - ARGOCD_GITHUB_ORG: The GitHub organization or user URL
+   # - VAULT: The 1Password vault name used to store secrets
+   ```
 
-```
+3. Generate the Kubernetes manifests:
+   ```bash
+   # Generate all manifests
+   ./scripts/render.sh --all
+   
+   # Or generate manifests for a specific application
+   ./scripts/render.sh --app <application-name>
+   ```
+
+4. Apply the generated manifests to your Kubernetes cluster using ArgoCD or kubectl.
 
 You should also create corresponding environment variables on your Github repository to match the `.env` file.
 This allows the CI steps to access the necessary secrets and configurations for generating the manifests and deploying them to your Kubernetes cluster.
+
+## Requirements
+
+- A Kubernetes cluster (recommended: [zaap-k3s](https://github.com/nandiheath/zaap-k3s))
+- kubectl and kustomize installed
+- yq installed for manifest processing
+- 1Password account for secret management
+- Cloudflare account for external access (if using cloudflared)
