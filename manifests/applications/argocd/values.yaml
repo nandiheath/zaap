@@ -19,5 +19,18 @@ configs:
     createSecret: true
 
   cm:
+    url: https://zaap.nandi.sh/argocd
+    
     # Enable server-side diff for Argo CD
     controller.diff.server.side: "true"
+    
+    dex.config: |
+      connectors:
+      - type: github
+        name: Github
+        id: github
+        config:
+          clientID: "Iv1.c4bcc7cfd7caf7f0"
+          clientSecret: $argocd-github-app:githubAppClientSecret
+          orgs:
+          - nandiheath

@@ -11,9 +11,6 @@ spec:
     - hosts:
         - zaap.nandi.sh
       port:
-        name: https
-        number: 443
-        protocol: HTTPS
-      tls:
-        credentialName: zaap-nandi-sh-tls
-        mode: SIMPLE
+        name: http
+        number: 80
+        protocol: HTTP
