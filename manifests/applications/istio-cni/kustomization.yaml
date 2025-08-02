@@ -15,4 +15,7 @@ helmCharts:
       enabled: true
     ambient:
       enabled: true
+    profile: ambient
+    global:
+      platform: k3s
 

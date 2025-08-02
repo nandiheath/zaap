@@ -1,9 +1,8 @@
 
-## Cert Rotation
+## TODO
 
-## Security Hardening
-
-- [ ] pod cannot ping host
-- [ ] pod cannot reach other subnet
 - [ ] enforce mTLS
+- [ ] enfore network policies
 - [ ] manage bootstrap/argocd with ArgoCD
+- [ ] add renovate
+- [ ] add prometheus (or other metrics scraper)

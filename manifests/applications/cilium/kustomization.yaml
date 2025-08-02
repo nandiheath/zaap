@@ -24,3 +24,8 @@ helmCharts:
               group: cert-manager.io
               kind: ClusterIssuer                
               name: selfsigned
+      ipam:
+        operator:
+          clusterPoolIPv4PodCIDRList:
+            - "10.45.0.0/16"
+            
