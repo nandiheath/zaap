@@ -2,13 +2,6 @@
 configs:
   # General Argo CD configuration
 
-  # -- Repositories list to be used by applications
-  ## Creates a secret for each key/value specified below to create repositories
-  ## Note: the last example in the list would use a repository credential template, configured under "configs.credentialTemplates".
-  repositories:
-    omnichan:
-      url: https://github.com/nandiheath/omnichan
-
   # -- Annotations to be added to `configs.repositories` Secret
   repositoriesAnnotations: {}
 
