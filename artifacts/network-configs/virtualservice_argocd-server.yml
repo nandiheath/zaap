@@ -16,7 +16,7 @@ spec:
         uri: /
       route:
         - destination:
-            host: argocd-server
+            host: argocd-server.argocd.svc.cluster.local
             port:
               number: 80
     - match:
