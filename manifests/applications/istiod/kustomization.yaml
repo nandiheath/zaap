@@ -11,3 +11,7 @@ helmCharts:
   releaseName: istiod
   namespace: istio-system
   version: 1.24.5  
+  valuesInline:
+    pilot:
+      env:
+        PILOT_ENABLE_AMBIENT: true
