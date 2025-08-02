@@ -15,10 +15,7 @@ spec:
   template:
     metadata:
       annotations:
-        container.apparmor.security.beta.kubernetes.io/apply-sysctl-overwrites: unconfined
-        container.apparmor.security.beta.kubernetes.io/cilium-agent: unconfined
-        container.apparmor.security.beta.kubernetes.io/clean-cilium-state: unconfined
-        container.apparmor.security.beta.kubernetes.io/mount-cgroup: unconfined
+        kubectl.kubernetes.io/default-container: cilium-agent
       labels:
         app.kubernetes.io/name: cilium-agent
         app.kubernetes.io/part-of: cilium
@@ -50,7 +47,16 @@ spec:
                   fieldPath: metadata.namespace
             - name: CILIUM_CLUSTERMESH_CONFIG
               value: /var/lib/cilium/clustermesh/
-          image: quay.io/cilium/cilium:v1.14.6@sha256:37a49f1abb333279a9b802ee8a21c61cde9dd9138b5ac55f77bdfca733ba852a
+            - name: GOMEMLIMIT
+              valueFrom:
+                resourceFieldRef:
+                  divisor: "1"
+                  resource: limits.memory
+            - name: KUBE_CLIENT_BACKOFF_BASE
+              value: "1"
+            - name: KUBE_CLIENT_BACKOFF_DURATION
+              value: "120"
+          image: quay.io/cilium/cilium:v1.18.0@sha256:dfea023972d06ec183cfa3c9e7809716f85daaff042e573ef366e9ec6a0c0ab2
           imagePullPolicy: IfNotPresent
           lifecycle:
             postStart:
@@ -89,6 +95,8 @@ spec:
               httpHeaders:
                 - name: brief
                   value: "true"
+                - name: require-k8s-connectivity
+                  value: "false"
               path: /healthz
               port: 9879
               scheme: HTTP
@@ -130,7 +138,7 @@ spec:
               level: s0
               type: spc_t
           startupProbe:
-            failureThreshold: 105
+            failureThreshold: 300
             httpGet:
               host: 127.0.0.1
               httpHeaders:
@@ -139,10 +147,14 @@ spec:
               path: /healthz
               port: 9879
               scheme: HTTP
+            initialDelaySeconds: 5
             periodSeconds: 2
             successThreshold: 1
           terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
+            - mountPath: /var/run/cilium/envoy/sockets
+              name: envoy-sockets
+              readOnly: false
             - mountPath: /host/proc/sys/net
               name: host-proc-sys-net
             - mountPath: /host/proc/sys/kernel
@@ -152,6 +164,9 @@ spec:
               name: bpf-maps
             - mountPath: /var/run/cilium
               name: cilium-run
+            - mountPath: /var/run/cilium/netns
+              mountPropagation: HostToContainer
+              name: cilium-netns
             - mountPath: /host/etc/cni/net.d
               name: etc-cni-netd
             - mountPath: /var/lib/cilium/clustermesh
@@ -170,7 +185,7 @@ spec:
       hostNetwork: true
       initContainers:
         - command:
-            - cilium
+            - cilium-dbg
             - build-config
           env:
             - name: K8S_NODE_NAME
@@ -183,7 +198,7 @@ spec:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: metadata.namespace
-          image: quay.io/cilium/cilium:v1.14.6@sha256:37a49f1abb333279a9b802ee8a21c61cde9dd9138b5ac55f77bdfca733ba852a
+          image: quay.io/cilium/cilium:v1.18.0@sha256:dfea023972d06ec183cfa3c9e7809716f85daaff042e573ef366e9ec6a0c0ab2
           imagePullPolicy: IfNotPresent
           name: config
           terminationMessagePolicy: FallbackToLogsOnError
@@ -202,7 +217,7 @@ spec:
               value: /run/cilium/cgroupv2
             - name: BIN_PATH
               value: /opt/cni/bin
-          image: quay.io/cilium/cilium:v1.14.6@sha256:37a49f1abb333279a9b802ee8a21c61cde9dd9138b5ac55f77bdfca733ba852a
+          image: quay.io/cilium/cilium:v1.18.0@sha256:dfea023972d06ec183cfa3c9e7809716f85daaff042e573ef366e9ec6a0c0ab2
           imagePullPolicy: IfNotPresent
           name: mount-cgroup
           securityContext:
@@ -232,7 +247,7 @@ spec:
           env:
             - name: BIN_PATH
               value: /opt/cni/bin
-          image: quay.io/cilium/cilium:v1.14.6@sha256:37a49f1abb333279a9b802ee8a21c61cde9dd9138b5ac55f77bdfca733ba852a
+          image: quay.io/cilium/cilium:v1.18.0@sha256:dfea023972d06ec183cfa3c9e7809716f85daaff042e573ef366e9ec6a0c0ab2
           imagePullPolicy: IfNotPresent
           name: apply-sysctl-overwrites
           securityContext:
@@ -258,7 +273,7 @@ spec:
             - /bin/bash
             - -c
             - --
-          image: quay.io/cilium/cilium:v1.14.6@sha256:37a49f1abb333279a9b802ee8a21c61cde9dd9138b5ac55f77bdfca733ba852a
+          image: quay.io/cilium/cilium:v1.18.0@sha256:dfea023972d06ec183cfa3c9e7809716f85daaff042e573ef366e9ec6a0c0ab2
           imagePullPolicy: IfNotPresent
           name: mount-bpf-fs
           securityContext:
@@ -283,7 +298,13 @@ spec:
                   key: clean-cilium-bpf-state
                   name: cilium-config
                   optional: true
-          image: quay.io/cilium/cilium:v1.14.6@sha256:37a49f1abb333279a9b802ee8a21c61cde9dd9138b5ac55f77bdfca733ba852a
+            - name: WRITE_CNI_CONF_WHEN_READY
+              valueFrom:
+                configMapKeyRef:
+                  key: write-cni-conf-when-ready
+                  name: cilium-config
+                  optional: true
+          image: quay.io/cilium/cilium:v1.18.0@sha256:dfea023972d06ec183cfa3c9e7809716f85daaff042e573ef366e9ec6a0c0ab2
           imagePullPolicy: IfNotPresent
           name: clean-cilium-state
           securityContext:
@@ -309,7 +330,7 @@ spec:
               name: cilium-run
         - command:
             - /install-plugin.sh
-          image: quay.io/cilium/cilium:v1.14.6@sha256:37a49f1abb333279a9b802ee8a21c61cde9dd9138b5ac55f77bdfca733ba852a
+          image: quay.io/cilium/cilium:v1.18.0@sha256:dfea023972d06ec183cfa3c9e7809716f85daaff042e573ef366e9ec6a0c0ab2
           imagePullPolicy: IfNotPresent
           name: install-cni-binaries
           resources:
@@ -331,7 +352,11 @@ spec:
         kubernetes.io/os: linux
       priorityClassName: system-node-critical
       restartPolicy: Always
-      serviceAccount: cilium
+      securityContext:
+        appArmorProfile:
+          type: Unconfined
+        seccompProfile:
+          type: Unconfined
       serviceAccountName: cilium
       terminationGracePeriodSeconds: 1
       tolerations:
@@ -343,6 +368,10 @@ spec:
             path: /var/run/cilium
             type: DirectoryOrCreate
           name: cilium-run
+        - hostPath:
+            path: /var/run/netns
+            type: DirectoryOrCreate
+          name: cilium-netns
         - hostPath:
             path: /sys/fs/bpf
             type: DirectoryOrCreate
@@ -370,6 +399,10 @@ spec:
             path: /run/xtables.lock
             type: FileOrCreate
           name: xtables-lock
+        - hostPath:
+            path: /var/run/cilium/envoy/sockets
+            type: DirectoryOrCreate
+          name: envoy-sockets
         - name: clustermesh-secrets
           projected:
             defaultMode: 256
@@ -386,6 +419,16 @@ spec:
                     - key: ca.crt
                       path: common-etcd-client-ca.crt
                   name: clustermesh-apiserver-remote-cert
+                  optional: true
+              - secret:
+                  items:
+                    - key: tls.key
+                      path: local-etcd-client.key
+                    - key: tls.crt
+                      path: local-etcd-client.crt
+                    - key: ca.crt
+                      path: local-etcd-client-ca.crt
+                  name: clustermesh-apiserver-local-cert
                   optional: true
         - hostPath:
             path: /proc/sys/net

@@ -47,6 +47,9 @@ rules:
     resources:
       - ciliumloadbalancerippools
       - ciliumbgppeeringpolicies
+      - ciliumbgpnodeconfigs
+      - ciliumbgpadvertisements
+      - ciliumbgppeerconfigs
       - ciliumclusterwideenvoyconfigs
       - ciliumclusterwidenetworkpolicies
       - ciliumegressgatewaypolicies
@@ -96,10 +99,9 @@ rules:
   - apiGroups:
       - cilium.io
     resources:
-      - ciliumnetworkpolicies/status
-      - ciliumclusterwidenetworkpolicies/status
       - ciliumendpoints/status
       - ciliumendpoints
       - ciliuml2announcementpolicies/status
+      - ciliumbgpnodeconfigs/status
     verbs:
       - patch
