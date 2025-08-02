@@ -14,6 +14,12 @@ data:
         clientID: Iv1.c4bcc7cfd7caf7f0
         clientSecret: $argocd-github-app:githubAppClientSecret
   exec.enabled: "false"
+  resource.customizations.ignoreDifferences.apps_DaemonSet: |
+    jqPathExpressions:
+    - .spec.template.spec.containers[].env[]?.valueFrom.resourceFieldRef.divisor
+  resource.customizations.ignoreDifferences.apps_Deployment: |
+    jqPathExpressions:
+    - .spec.template.spec.containers[].env[]?.valueFrom.resourceFieldRef.divisor
   resource.customizations.ignoreResourceUpdates.ConfigMap: |
     jqPathExpressions:
       # Ignore the cluster-autoscaler status

@@ -2,13 +2,6 @@
 configs:
   # General Argo CD configuration
 
-  # -- Repositories list to be used by applications
-  ## Creates a secret for each key/value specified below to create repositories
-  ## Note: the last example in the list would use a repository credential template, configured under "configs.credentialTemplates".
-  repositories:
-    omnichan:
-      url: https://github.com/nandiheath/omnichan
-
   # -- Annotations to be added to `configs.repositories` Secret
   repositoriesAnnotations: {}
 
@@ -35,6 +28,14 @@ configs:
     # enable admin for local admin account
     admin.enabled: "false"
     
+    # Ignore divisor field during diff operations (this is the default value being populated when using server side diff)    
+    resource.customizations.ignoreDifferences.apps_Deployment: |
+      jqPathExpressions:
+      - .spec.template.spec.containers[].env[]?.valueFrom.resourceFieldRef.divisor
+    resource.customizations.ignoreDifferences.apps_DaemonSet: |
+      jqPathExpressions:
+      - .spec.template.spec.containers[].env[]?.valueFrom.resourceFieldRef.divisor
+      
     dex.config: |
       connectors:
       - type: github

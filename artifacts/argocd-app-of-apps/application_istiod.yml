@@ -10,6 +10,12 @@ spec:
   destination:
     namespace: istio-system
     server: https://kubernetes.default.svc
+  ignoreDifferences:
+    - group: admissionregistration.k8s.io
+      jqPathExpressions:
+        - .webhooks[] | select(.name == "validation.istio.io") | .failurePolicy
+      kind: ValidatingWebhookConfiguration
+      name: istiod-default-validator
   project: default
   revisionHistoryLimit: 10
   source:
