@@ -5,3 +5,4 @@ resources:
   - gateway.yaml
   - virtualservice-argocd.yaml
   - virtualservice-testapp.yaml
+  - virtualservice-prometheus.yaml

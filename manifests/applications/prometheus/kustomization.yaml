@@ -12,9 +12,15 @@ helmCharts:
     namespace: prometheus
     version: 27.29.0
     valuesInline:
+
       alertmanager:
         enabled: false
       server:
+        prefixURL: "/prometheus"
+          
+          ## External URL which can access prometheus
+          ## Maybe same with Ingress host name
+        baseURL: "https://zaap.nandi.sh/prometheus"
         resources:
           limits:
             memory: 1.5Gi
