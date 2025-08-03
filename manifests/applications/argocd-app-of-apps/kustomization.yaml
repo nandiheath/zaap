@@ -17,7 +17,9 @@ resources:
   - apps/network-configs.yaml
   - apps/test-app.yaml
   - apps/cilium.yaml    
-  - apps/prometheus.yamlpatches:
+  - apps/prometheus.yaml
+
+patches:
   - path: base-application.yaml
     target:
       kind: Application
