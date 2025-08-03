@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yaml
+
+# https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus/values.yaml
+helmCharts:
+  - name: prometheus
+    repo: https://prometheus-community.github.io/helm-charts
+    releaseName: prometheus
+    namespace: prometheus
+    version: 27.29.0
+    valuesInline:
+      alertmanager:
+        enabled: false
+      server:
+        resources:
+          limits:
+            memory: 1.5Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        persistentVolume:
+          size: 4Gi
+        retention: 7d
+
+      
