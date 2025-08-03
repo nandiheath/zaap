@@ -21,3 +21,7 @@
 ## Known Issue
 
 - Cilium Kuberneter Service Host is a static IP. explore solution to make it behind a LB.
+
+## Bug Fix
+
+- [ ] prevent commiting if render errors at CI
