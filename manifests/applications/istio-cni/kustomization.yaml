@@ -11,11 +11,8 @@ helmCharts:
   version: 1.24.5
   includeCRDs: true
   valuesInline:
-    cni:
-      enabled: true
     ambient:
       enabled: true
     profile: ambient
-    global:
-      platform: k3s
+
 

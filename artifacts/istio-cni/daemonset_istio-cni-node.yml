@@ -136,7 +136,7 @@ spec:
           operator: Exists
       volumes:
         - hostPath:
-            path: /var/lib/rancher/k3s/data/current/bin/
+            path: /opt/cni/bin
           name: cni-bin-dir
         - hostPath:
             path: /proc
@@ -147,7 +147,7 @@ spec:
             type: DirectoryOrCreate
           name: cni-ztunnel-sock-dir
         - hostPath:
-            path: /var/lib/rancher/k3s/agent/etc/cni/net.d
+            path: /etc/cni/net.d
           name: cni-net-dir
         - hostPath:
             path: /var/run/istio-cni
