@@ -39,6 +39,30 @@ The Zaap stack uses several key components working together:
 
 ![network-diagram.png](network-diagram.png)
 
+
+### Prerequisites & Important Notes
+
+> ⚠️ **Critical Setup Requirements**
+>
+> Before proceeding with Zaap installation, ensure your environment meets these prerequisites:
+
+#### Kubernetes Cluster
+- **Base Cluster**: A functioning Kubernetes cluster is required
+  - **Recommended**: [zaap-k3s](https://github.com/nandiheath/zaap-k3s) for optimal compatibility
+  - This lightweight distribution is specifically designed for home labs and edge computing
+
+#### Network Configuration
+- **CNI Requirements**: 
+  - Kubernetes cluster must be configured **without** kube-proxy and flannel
+  - Cilium will be used as the CNI provider instead
+  - [📚 K3s Configuration Guide](https://docs.cilium.io/en/v1.12/gettingstarted/k3s/#getting-started-using-k3s)
+
+#### Service Mesh
+- **Istio & Cilium Integration**: 
+  - This setup uses Istio compatibility with Cilium in ambient mode
+  - Proper configuration is essential for networking functionality
+  - [📚 Integration Guide](https://docs.cilium.io/en/latest/network/servicemesh/istio/)
+
 ### Getting Started
 
 1. Clone this repository:
