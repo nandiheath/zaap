@@ -7,3 +7,4 @@ resources:
   - application.yaml
   - namespace-1password.yaml
   - namespace-argocd.yaml
+  - clusterissuer.yaml

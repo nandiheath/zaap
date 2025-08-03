@@ -3,8 +3,7 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
-  - issuer.yaml
-
+  
 helmCharts:
   - name: cert-manager
     repo: https://charts.jetstack.io

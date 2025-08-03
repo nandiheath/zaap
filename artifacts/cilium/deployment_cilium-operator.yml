@@ -62,6 +62,10 @@ spec:
                   key: debug
                   name: cilium-config
                   optional: true
+            - name: KUBERNETES_SERVICE_HOST
+              value: 10.43.2.1
+            - name: KUBERNETES_SERVICE_PORT
+              value: "6443"
           image: quay.io/cilium/operator-generic:v1.18.0@sha256:398378b4507b6e9db22be2f4455d8f8e509b189470061b0f813f0fabaf944f51
           imagePullPolicy: IfNotPresent
           livenessProbe:

@@ -40,7 +40,12 @@ resource_exists() {
 create_namespace_if_not_exists() {
   if ! namespace_exists "$1"; then
     print_info "Creating namespace: $1"
-    kubectl create namespace "$1"
+    kubectl apply --server-side -f - <<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: $1
+EOF
   else
     print_info "Namespace $1 already exists"
   fi
@@ -71,28 +76,66 @@ fi
 create_namespace_if_not_exists "external-secrets"
 create_namespace_if_not_exists "1password"
 create_namespace_if_not_exists "argocd"
+create_namespace_if_not_exists "cert-manager"
+create_namespace_if_not_exists "cilium-secrets"
+
+
 
 # Create the secrets
 if ! resource_exists "external-secrets" "secret" "onepassword-connect-token"; then
   print_info "Creating onepassword-connect-token secret in external-secrets namespace"
-  kubectl create secret generic onepassword-connect-token -n external-secrets \
-    --from-literal=token="$(tr -d '\n' < credentials/1password/1password-token.txt)"
+  TOKEN_VALUE=$(tr -d '\n' < credentials/1password/1password-token.txt)
+  kubectl apply --server-side -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: onepassword-connect-token
+  namespace: external-secrets
+type: Opaque
+stringData:
+  token: "$TOKEN_VALUE"
+EOF
 else
   print_info "Secret onepassword-connect-token already exists in external-secrets namespace"
 fi
 
 if ! resource_exists "1password" "secret" "op-credentials"; then
   print_info "Creating op-credentials secret in 1password namespace"
-  kubectl create secret generic op-credentials -n 1password \
-    --from-literal=1password-credentials.json="$(base64 -i credentials/1password/1password-credentials.json)"
+  CREDENTIALS_VALUE=$(base64 -i credentials/1password/1password-credentials.json)
+  kubectl apply --server-side -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: op-credentials
+  namespace: 1password
+type: Opaque
+stringData:
+  1password-credentials.json: "$CREDENTIALS_VALUE"
+EOF
 else
   print_info "Secret op-credentials already exists in 1password namespace"
+fi
+
+# Check if cert-manager is installed, if not, install it
+if ! resource_exists "cert-manager" "deployment" "cert-manager"; then
+  print_info "Installing cert-manager"
+  kubectl apply --server-side -f artifacts/cert-manager/
+else
+  print_info "cert-manager is already installed"
+fi
+
+# Check if cilium is installed, if not, install it
+if ! resource_exists "kube-system" "daemonset" "cilium"; then
+  print_info "Installing Cilium"
+  kubectl apply --server-side -f artifacts/cilium/
+else
+  print_info "Cilium is already installed"
 fi
 
 # Check if external-secrets is installed, if not, install it
 if ! resource_exists "external-secrets" "deployment" "external-secrets"; then
   print_info "Installing External Secrets Operator"
-  kubectl apply -f artifacts/external-secrets/
+  kubectl apply --server-side -f artifacts/external-secrets/
 else
   print_info "External Secrets Operator is already installed"
 fi
@@ -100,18 +143,18 @@ fi
 # Check if argocd is installed, if not, install it
 if ! resource_exists "argocd" "deployment" "argocd-server"; then
   print_info "Installing ArgoCD"
-  kubectl apply -f artifacts/argocd/
+  kubectl apply --server-side -f artifacts/argocd/
 else
   print_info "ArgoCD is already installed"
 fi
 
 # Apply the 1Password Connect manifests
 print_info "Applying 1Password Connect manifests"
-kubectl apply -f artifacts/1password-connect/
+kubectl apply --server-side -f artifacts/1password-connect/
 
 # Apply the bootstrap manifests
 print_info "Applying bootstrap manifests"
-kubectl apply -f artifacts/bootstrap/
+kubectl apply --server-side -f artifacts/bootstrap/
 
 print_info "Bootstrap completed successfully!"
 print_info "You can now access ArgoCD and start deploying applications."
