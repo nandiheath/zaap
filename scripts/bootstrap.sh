@@ -116,10 +116,19 @@ else
   print_info "Secret op-credentials already exists in 1password namespace"
 fi
 
+
+# Apply the bootstrap namespaces
+print_info "Applying namespaces"
+kubectl apply --server-side -f artifacts/infrastructure/cluster-namespaces
+
+# Apply the bootstrap manifests
+print_info "Applying bootstrap manifests"
+kubectl apply --server-side -f artifacts/infrastructure/bootstrap
+
 # Check if cert-manager is installed, if not, install it
 if ! resource_exists "cert-manager" "deployment" "cert-manager"; then
   print_info "Installing cert-manager"
-  kubectl apply --server-side -f artifacts/cert-manager/
+  kubectl apply --server-side -f artifacts/infrastructure/cert-manager/
 else
   print_info "cert-manager is already installed"
 fi
@@ -127,7 +136,7 @@ fi
 # Check if cilium is installed, if not, install it
 if ! resource_exists "kube-system" "daemonset" "cilium"; then
   print_info "Installing Cilium"
-  kubectl apply --server-side -f artifacts/cilium/
+  kubectl apply --server-side -f artifacts/infrastructure/cilium/
 else
   print_info "Cilium is already installed"
 fi
@@ -135,7 +144,7 @@ fi
 # Check if external-secrets is installed, if not, install it
 if ! resource_exists "external-secrets" "deployment" "external-secrets"; then
   print_info "Installing External Secrets Operator"
-  kubectl apply --server-side -f artifacts/external-secrets/
+  kubectl apply --server-side -f artifacts/infrastructure/external-secrets/
 else
   print_info "External Secrets Operator is already installed"
 fi
@@ -143,18 +152,18 @@ fi
 # Check if argocd is installed, if not, install it
 if ! resource_exists "argocd" "deployment" "argocd-server"; then
   print_info "Installing ArgoCD"
-  kubectl apply --server-side -f artifacts/argocd/
+  kubectl apply --server-side -f artifacts/infrastructure/argocd/
 else
   print_info "ArgoCD is already installed"
 fi
 
 # Apply the 1Password Connect manifests
 print_info "Applying 1Password Connect manifests"
-kubectl apply --server-side -f artifacts/1password-connect/
+kubectl apply --server-side -f artifacts/infrastructure/1password-connect/
 
-# Apply the bootstrap manifests
-print_info "Applying bootstrap manifests"
-kubectl apply --server-side -f artifacts/bootstrap/
+# Apply the 1Password Connect manifests
+print_info "Applying Network Configuration Manifests"
+kubectl apply --server-side -f artifacts/infrastructure/cluster-network-configs/
 
 print_info "Bootstrap completed successfully!"
 print_info "You can now access ArgoCD and start deploying applications."

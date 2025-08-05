@@ -1,0 +1,10 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb
+spec:
+  source:
+    path: artifacts/infrastructuremetallb
+# to allow metallb to install ClusterRole
+#  destination:
+#    namespace: metallb-system

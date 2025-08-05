@@ -1,0 +1,9 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: istio-ingressgateway
+spec:
+  source:
+    path: artifacts/infrastructureistio-ingressgateway
+  destination:
+    namespace: istio-system

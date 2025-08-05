@@ -15,7 +15,7 @@ fi
 
 set -oeu pipefail
 
-RENDER_DIR="artifacts"
+RENDER_DIR="artifacts/infrastructure"
 # Create a single temp directory for all interpolated manifests
 TMP_MANIFESTS_ROOT="$(mktemp -d "/tmp/manifests.XXXXXX")"
 
@@ -29,11 +29,11 @@ if [[ $# -eq 0 ]]; then
 else
   case "$1" in
     --all)
-      manifests_list=$(list_folders manifests/applications/*)
+      manifests_list=$(list_folders manifests/infrastructure/*)
       ;;
     --app)
       if [[ -n "${2:-}" ]]; then
-        manifests_list="manifests/applications/${2}"
+        manifests_list="manifests/infrastructure/${2}"
       else
         echo "Error: --app requires a path argument" >&2
         exit 1
