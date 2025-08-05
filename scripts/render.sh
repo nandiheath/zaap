@@ -7,6 +7,7 @@
 # - Provides debug output in CI environments
 # - Includes robust error handling for git operations and external tools
 # - Falls back to processing all applications if git history is not available
+# - Supports both infrastructure and application manifests
 
 # Enable debug output in CI environment
 if [[ "${CI:-}" == "true" ]]; then
@@ -15,7 +16,8 @@ fi
 
 set -oeu pipefail
 
-RENDER_DIR="artifacts/infrastructure"
+# Default to infrastructure if not specified
+MANIFEST_TYPE="infrastructure"
 # Create a single temp directory for all interpolated manifests
 TMP_MANIFESTS_ROOT="$(mktemp -d "/tmp/manifests.XXXXXX")"
 
@@ -23,26 +25,76 @@ dir_path=$(dirname "${BASH_SOURCE[0]}")
 
 source "$dir_path/lib.sh"
 
-if [[ $# -eq 0 ]]; then
-  echo "Detecting changed manifests..."
-  manifests_list=$(changed_files "manifests")
-else
+function show_help() {
+  echo "Usage: $0 [options]"
+  echo ""
+  echo "Options:"
+  echo "  --all                Process all manifests"
+  echo "  --app <name>         Process a specific app"
+  echo "  --infra              Process infrastructure manifests (default)"
+  echo "  --application        Process application manifests"
+  echo "  -h, --help           Show this help message"
+  echo ""
+  echo "Examples:"
+  echo "  $0                   Process changed manifests (defaults to infrastructure)"
+  echo "  $0 --all --infra     Process all infrastructure manifests"
+  echo "  $0 --all --application  Process all application manifests"
+  echo "  $0 --app myapp --application  Process specific application manifest"
+}
+
+# Parse arguments
+ALL_FLAG=false
+APP_NAME=""
+
+while [[ $# -gt 0 ]]; do
   case "$1" in
     --all)
-      manifests_list=$(list_folders manifests/infrastructure/*)
+      ALL_FLAG=true
+      shift
       ;;
     --app)
       if [[ -n "${2:-}" ]]; then
-        manifests_list="manifests/infrastructure/${2}"
+        APP_NAME="$2"
+        shift 2
       else
         echo "Error: --app requires a path argument" >&2
         exit 1
       fi
       ;;
+    --infra)
+      MANIFEST_TYPE="infrastructure"
+      shift
+      ;;
+    --application)
+      MANIFEST_TYPE="application"
+      shift
+      ;;
+    -h|--help)
+      show_help
+      exit 0
+      ;;
     *)
-      manifests_list=$(changed_files "manifests")
+      echo "Unknown option: $1" >&2
+      show_help
+      exit 1
       ;;
   esac
+done
+
+# Set render directory based on manifest type
+RENDER_DIR="artifacts/${MANIFEST_TYPE}"
+
+# Create manifests directory if it doesn't exist
+mkdir -p "manifests/${MANIFEST_TYPE}"
+
+# Determine which manifests to process
+if [[ "$ALL_FLAG" == "true" ]]; then
+  manifests_list=$(list_folders manifests/${MANIFEST_TYPE}/*)
+elif [[ -n "$APP_NAME" ]]; then
+  manifests_list="manifests/${MANIFEST_TYPE}/${APP_NAME}"
+else
+  echo "Detecting changed manifests..."
+  manifests_list=$(changed_files "manifests/${MANIFEST_TYPE}")
 fi
 
 # Load environment variables from config/.env if it exists
@@ -87,7 +139,9 @@ for manifests in $manifests_list ; do
   tmp_manifests="$(create_tmp_subdir "$manifests")"
   interpolate_manifests "$manifests" "$tmp_manifests"
   echo "rendering manifests from $tmp_manifests"
-  output_path="$RENDER_DIR/$(echo "$manifests" | cut -d'/' -f3-4)"
+  # Extract the app name from the manifest path (last part of the path)
+  app_name=$(basename "$manifests")
+  output_path="$RENDER_DIR/$app_name"
   mkdir -p "$output_path"
   rm -rf $output_path/*  # Clear previous output
   

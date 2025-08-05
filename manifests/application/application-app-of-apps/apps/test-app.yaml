@@ -4,6 +4,6 @@ metadata:
   name: test-app
 spec:
   source:
-    path: artifacts/infrastructuretest-app
+    path: artifacts/application/test-app
   destination:
     namespace: test-app

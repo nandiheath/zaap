@@ -1,0 +1,9 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: test-app
+spec:
+  source:
+    path: artifacts/application/test-app
+  destination:
+    namespace: test-app
