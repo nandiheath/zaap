@@ -4,6 +4,6 @@ metadata:
   name: cloudflared
 spec:
   source:
-    path: artifacts/infrastructurecloudflared
+    path: artifacts/infrastructure/cloudflared
   destination:
     namespace: cloudflared

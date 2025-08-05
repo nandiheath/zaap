@@ -4,6 +4,6 @@ metadata:
   name: istio-ztunnel
 spec:
   source:
-    path: artifacts/infrastructureistio-ztunnel
+    path: artifacts/infrastructure/istio-ztunnel
   destination:
     namespace: istio-system

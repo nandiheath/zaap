@@ -3,13 +3,3 @@ kind: Kustomization
 
 resources:
   - virtualservice-testapp.yaml
-  
-patches:
-  - target:
-      kind: Namespace
-    patch: |-
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        labels:
-          istio.io/dataplane-mode: ambient

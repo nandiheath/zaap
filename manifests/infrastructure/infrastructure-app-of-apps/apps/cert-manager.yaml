@@ -4,6 +4,6 @@ metadata:
   name: cert-manager
 spec:
   source:
-    path: artifacts/infrastructurecert-manager
+    path: artifacts/infrastructure/cert-manager
   destination:
     namespace: cert-manager

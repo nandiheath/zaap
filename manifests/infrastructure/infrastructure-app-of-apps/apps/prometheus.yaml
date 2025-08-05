@@ -4,5 +4,5 @@ metadata:
   name: prometheus
 spec:
   source:
-    path: artifacts/infrastructureprometheus
+    path: artifacts/infrastructure/prometheus
   

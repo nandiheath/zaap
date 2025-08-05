@@ -4,7 +4,7 @@ metadata:
   name: metallb
 spec:
   source:
-    path: artifacts/infrastructuremetallb
+    path: artifacts/infrastructure/metallb
 # to allow metallb to install ClusterRole
 #  destination:
 #    namespace: metallb-system

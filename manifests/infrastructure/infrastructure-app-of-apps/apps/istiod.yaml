@@ -4,7 +4,7 @@ metadata:
   name: istiod
 spec:
   source:
-    path: artifacts/infrastructureistiod
+    path: artifacts/infrastructure/istiod
   destination:
     namespace: istio-system
   ignoreDifferences:

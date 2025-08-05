@@ -4,4 +4,4 @@ metadata:
   name: cilium
 spec:
   source:
-    path: artifacts/infrastructurecilium
+    path: artifacts/infrastructure/cilium

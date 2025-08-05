@@ -4,4 +4,4 @@ metadata:
   name: network-configs
 spec:
   source:
-    path: artifacts/infrastructurenetwork-configs
+    path: artifacts/infrastructure/network-configs

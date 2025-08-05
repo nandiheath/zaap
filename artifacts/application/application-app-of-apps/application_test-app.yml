@@ -4,25 +4,19 @@ kind: Application
 metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
-  name: istio-base
+  name: test-app
   namespace: argocd
 spec:
   destination:
-    namespace: istio-system
+    namespace: test-app
     server: https://kubernetes.default.svc
-  ignoreDifferences:
-    - group: admissionregistration.k8s.io
-      jqPathExpressions:
-        - .webhooks[] | select(.name == "validation.istio.io") | .failurePolicy
-      kind: ValidatingWebhookConfiguration
-      name: istiod-default-validator
   project: default
   revisionHistoryLimit: 10
   source:
     directory:
       include: '{*.yaml,*.yml}'
       recurse: true
-    path: artifacts/infrastructureistio-base
+    path: artifacts/application/test-app
     repoURL: https://github.com/nandiheath/zaap
     targetRevision: main
   syncPolicy:

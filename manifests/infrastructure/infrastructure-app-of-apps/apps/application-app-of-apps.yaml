@@ -1,0 +1,7 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: application-app-of-apps
+spec:
+  source:
+    path: artifacts/application/application-app-of-apps
