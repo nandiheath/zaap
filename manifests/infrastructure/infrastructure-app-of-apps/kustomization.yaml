@@ -14,7 +14,8 @@ resources:
   - apps/istiod.yaml
   - apps/metallb.yaml
   - apps/cert-manager.yaml
-  - apps/network-configs.yaml
+  - apps/cluster-network-configs.yaml
+  - apps/cluster-namespaces.yaml
   - apps/cilium.yaml    
   - apps/prometheus.yaml
   - apps/application-app-of-apps.yaml
