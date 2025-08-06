@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - gateway.yaml
   - virtualservice-prometheus.yaml
+  - virtualservice-argocd.yaml

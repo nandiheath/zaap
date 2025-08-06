@@ -2,6 +2,9 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: istio-base
+  annotations:
+    # apply after istiod being updated
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   source:
     path: artifacts/infrastructure/istio-base

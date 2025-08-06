@@ -2,6 +2,9 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: cluster-network-configs
+  annotations:
+    # apply once all istio components are ready
+    argocd.argoproj.io/sync-wave: "4"
 spec:
   source:
     path: artifacts/infrastructure/cluster-network-configs

@@ -1,9 +1,8 @@
----
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: prometheus
-  namespace: prometheus
+  name: argocd-server
+  namespace: argocd
 spec:
   gateways:
     - istio-system/ingress-gateway
@@ -12,9 +11,9 @@ spec:
   http:
     - match:
         - uri:
-            prefix: /prometheus
+            prefix: /argocd
       route:
         - destination:
-            host: prometheus-server.prometheus.svc.cluster.local
+            host: argocd-server.argocd.svc.cluster.local
             port:
               number: 80

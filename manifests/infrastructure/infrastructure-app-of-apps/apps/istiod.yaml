@@ -2,6 +2,8 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: istiod
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   source:
     path: artifacts/infrastructure/istiod

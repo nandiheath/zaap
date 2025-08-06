@@ -2,6 +2,9 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: metallb
+  annotations:
+    # apply at last
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   source:
     path: artifacts/infrastructure/metallb
