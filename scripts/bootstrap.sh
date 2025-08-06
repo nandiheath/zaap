@@ -36,6 +36,52 @@ resource_exists() {
   kubectl get -n "$namespace" "$resource_type" "$resource_name" &> /dev/null
 }
 
+# Function to wait for all pods in a namespace to be ready
+wait_for_pods_ready() {
+  local namespace=$1
+  local timeout=${2:-300}  # Default timeout of 300 seconds (5 minutes)
+  local interval=${3:-5}   # Default check interval of 5 seconds
+  
+  print_info "Waiting for pods in namespace '$namespace' to be ready (timeout: ${timeout}s)..."
+  
+  local end_time=$(($(date +%s) + timeout))
+  
+  while [ $(date +%s) -lt $end_time ]; do
+    # Get all pods in the namespace
+    local pods_status=$(kubectl get pods -n "$namespace" -o jsonpath='{.items[*].status.phase}' 2>/dev/null)
+    local containers_ready=$(kubectl get pods -n "$namespace" -o jsonpath='{.items[*].status.containerStatuses[*].ready}' 2>/dev/null)
+    
+    # If no pods found yet, wait and try again
+    if [ -z "$pods_status" ]; then
+      print_info "No pods found in namespace '$namespace' yet. Waiting..."
+      sleep $interval
+      continue
+    fi
+    
+    # Check if any pods are not Running
+    if [[ "$pods_status" == *"Pending"* ]] || [[ "$pods_status" == *"Failed"* ]] || [[ "$pods_status" == *"Unknown"* ]]; then
+      print_info "Some pods in namespace '$namespace' are not running yet. Waiting..."
+      sleep $interval
+      continue
+    fi
+    
+    # Check if all containers are ready
+    if [[ "$containers_ready" == *"false"* ]]; then
+      print_info "Some containers in namespace '$namespace' are not ready yet. Waiting..."
+      sleep $interval
+      continue
+    fi
+    
+    # All pods are Running and all containers are ready
+    print_info "All pods in namespace '$namespace' are ready!"
+    return 0
+  done
+  
+  print_error "Timeout waiting for pods in namespace '$namespace' to be ready"
+  kubectl get pods -n "$namespace"
+  return 1
+}
+
 # Function to create namespace if it doesn't exist
 create_namespace_if_not_exists() {
   if ! namespace_exists "$1"; then
@@ -116,18 +162,34 @@ else
   print_info "Secret op-credentials already exists in 1password namespace"
 fi
 
+
+# Apply the bootstrap namespaces
+print_info "Applying namespaces"
+kubectl apply --server-side -f artifacts/infrastructure/cluster-namespaces
+
+# Check if argocd is installed, if not, install it
+if ! resource_exists "argocd" "deployment" "argocd-server"; then
+  print_info "Installing ArgoCD"
+  kubectl apply --server-side -f artifacts/infrastructure/argocd/
+else
+  print_info "ArgoCD is already installed"
+fi
+
 # Check if cert-manager is installed, if not, install it
 if ! resource_exists "cert-manager" "deployment" "cert-manager"; then
   print_info "Installing cert-manager"
-  kubectl apply --server-side -f artifacts/cert-manager/
+  kubectl apply --server-side -f artifacts/infrastructure/cert-manager/
 else
   print_info "cert-manager is already installed"
 fi
 
+# Wait for cert-manager pods to be ready
+wait_for_pods_ready "cert-manager"
+
 # Check if cilium is installed, if not, install it
 if ! resource_exists "kube-system" "daemonset" "cilium"; then
   print_info "Installing Cilium"
-  kubectl apply --server-side -f artifacts/cilium/
+  kubectl apply --server-side -f artifacts/infrastructure/cilium/
 else
   print_info "Cilium is already installed"
 fi
@@ -135,26 +197,21 @@ fi
 # Check if external-secrets is installed, if not, install it
 if ! resource_exists "external-secrets" "deployment" "external-secrets"; then
   print_info "Installing External Secrets Operator"
-  kubectl apply --server-side -f artifacts/external-secrets/
+  kubectl apply --server-side -f artifacts/infrastructure/external-secrets/
 else
   print_info "External Secrets Operator is already installed"
 fi
 
-# Check if argocd is installed, if not, install it
-if ! resource_exists "argocd" "deployment" "argocd-server"; then
-  print_info "Installing ArgoCD"
-  kubectl apply --server-side -f artifacts/argocd/
-else
-  print_info "ArgoCD is already installed"
-fi
+# Wait for external-secrets pods to be ready
+wait_for_pods_ready "external-secrets"
 
 # Apply the 1Password Connect manifests
 print_info "Applying 1Password Connect manifests"
-kubectl apply --server-side -f artifacts/1password-connect/
+kubectl apply --server-side -f artifacts/infrastructure/1password-connect/
 
 # Apply the bootstrap manifests
 print_info "Applying bootstrap manifests"
-kubectl apply --server-side -f artifacts/bootstrap/
+kubectl apply --server-side -f artifacts/infrastructure/bootstrap
 
 print_info "Bootstrap completed successfully!"
 print_info "You can now access ArgoCD and start deploying applications."

@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: istiod
+spec:
+  source:
+    path: artifacts/infrastructure/istiod
+  destination:
+    namespace: istio-system
+  ignoreDifferences:
+    # https://github.com/istio/istio/issues/52785
+    - group: admissionregistration.k8s.io
+      kind: ValidatingWebhookConfiguration
+      name: istiod-default-validator
+      jqPathExpressions:
+        - .webhooks[] | select(.name == "validation.istio.io") | .failurePolicy

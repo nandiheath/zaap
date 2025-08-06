@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: argocd
+
+resources:
+  - apps/1password-connect.yaml
+  - apps/external-secrets.yaml
+  - apps/cloudflared.yaml
+  - apps/istio-base.yaml
+  - apps/istio-ingressgateway.yaml
+  - apps/istio-ztunnel.yaml
+  - apps/istio-cni.yaml
+  - apps/istiod.yaml
+  - apps/metallb.yaml
+  - apps/cert-manager.yaml
+  - apps/network-configs.yaml
+  - apps/cilium.yaml    
+  - apps/prometheus.yaml
+  - apps/application-app-of-apps.yaml
+
+patches:
+  - path: base-application.yaml
+    target:
+      kind: Application
+  
+      
