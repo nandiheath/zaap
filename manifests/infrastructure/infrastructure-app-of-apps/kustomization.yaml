@@ -19,7 +19,7 @@ resources:
   - apps/cilium.yaml    
   - apps/prometheus.yaml
   - apps/application-app-of-apps.yaml
-
+  - apps/grafana.yaml
 patches:
   - path: base-application.yaml
     target:
