@@ -1,0 +1,11 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: longhorn
+  annotations:
+    # should apply early for setting up storage class and the CSI
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  source:
+    path: artifacts/infrastructure/longhorn
+

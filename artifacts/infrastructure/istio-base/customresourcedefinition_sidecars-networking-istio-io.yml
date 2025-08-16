@@ -404,7 +404,6 @@ spec:
                     mode:
                       description: |2-
 
-
                         Valid Options: REGISTRY_ONLY, ALLOW_ANY
                       enum:
                         - REGISTRY_ONLY
@@ -877,7 +876,6 @@ spec:
                     mode:
                       description: |2-
 
-
                         Valid Options: REGISTRY_ONLY, ALLOW_ANY
                       enum:
                         - REGISTRY_ONLY
@@ -1349,7 +1347,6 @@ spec:
                       type: object
                     mode:
                       description: |2-
-
 
                         Valid Options: REGISTRY_ONLY, ALLOW_ANY
                       enum:

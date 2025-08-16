@@ -15,4 +15,4 @@ spec:
       kind: ValidatingWebhookConfiguration
       name: istiod-default-validator
       jqPathExpressions:
-        - .webhooks[] | select(.name == "validation.istio.io") | .failurePolicy
+        - .webhooks[].failurePolicy
