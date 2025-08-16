@@ -3,28 +3,21 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/sync-wave: "1"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
-  name: istiod
+  name: longhorn
   namespace: argocd
 spec:
   destination:
-    namespace: istio-system
     server: https://kubernetes.default.svc
-  ignoreDifferences:
-    - group: admissionregistration.k8s.io
-      jqPathExpressions:
-        - .webhooks[].failurePolicy
-      kind: ValidatingWebhookConfiguration
-      name: istiod-default-validator
   project: default
   revisionHistoryLimit: 10
   source:
     directory:
       include: '{*.yaml,*.yml}'
       recurse: true
-    path: artifacts/infrastructure/istiod
+    path: artifacts/infrastructure/longhorn
     repoURL: https://github.com/nandiheath/zaap
     targetRevision: main
   syncPolicy:

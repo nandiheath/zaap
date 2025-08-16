@@ -10,3 +10,4 @@ resources:
   - namespace-cert-manager.yaml
   - namespace-cloudflared.yaml
   - namespace-grafana.yaml
+  - namespace-longhorn.yaml

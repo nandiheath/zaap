@@ -289,7 +289,6 @@ spec:
                               simple:
                                 description: |2-
 
-
                                   Valid Options: LEAST_CONN, RANDOM, PASSTHROUGH, ROUND_ROBIN, LEAST_REQUEST
                                 enum:
                                   - UNSPECIFIED
@@ -604,7 +603,6 @@ spec:
                                       type: object
                                     simple:
                                       description: |2-
-
 
                                         Valid Options: LEAST_CONN, RANDOM, PASSTHROUGH, ROUND_ROBIN, LEAST_REQUEST
                                       enum:
@@ -1051,7 +1049,6 @@ spec:
                         simple:
                           description: |2-
 
-
                             Valid Options: LEAST_CONN, RANDOM, PASSTHROUGH, ROUND_ROBIN, LEAST_REQUEST
                           enum:
                             - UNSPECIFIED
@@ -1366,7 +1363,6 @@ spec:
                                 type: object
                               simple:
                                 description: |2-
-
 
                                   Valid Options: LEAST_CONN, RANDOM, PASSTHROUGH, ROUND_ROBIN, LEAST_REQUEST
                                 enum:
@@ -1937,7 +1933,6 @@ spec:
                               simple:
                                 description: |2-
 
-
                                   Valid Options: LEAST_CONN, RANDOM, PASSTHROUGH, ROUND_ROBIN, LEAST_REQUEST
                                 enum:
                                   - UNSPECIFIED
@@ -2252,7 +2247,6 @@ spec:
                                       type: object
                                     simple:
                                       description: |2-
-
 
                                         Valid Options: LEAST_CONN, RANDOM, PASSTHROUGH, ROUND_ROBIN, LEAST_REQUEST
                                       enum:
@@ -2699,7 +2693,6 @@ spec:
                         simple:
                           description: |2-
 
-
                             Valid Options: LEAST_CONN, RANDOM, PASSTHROUGH, ROUND_ROBIN, LEAST_REQUEST
                           enum:
                             - UNSPECIFIED
@@ -3014,7 +3007,6 @@ spec:
                                 type: object
                               simple:
                                 description: |2-
-
 
                                   Valid Options: LEAST_CONN, RANDOM, PASSTHROUGH, ROUND_ROBIN, LEAST_REQUEST
                                 enum:
@@ -3585,7 +3577,6 @@ spec:
                               simple:
                                 description: |2-
 
-
                                   Valid Options: LEAST_CONN, RANDOM, PASSTHROUGH, ROUND_ROBIN, LEAST_REQUEST
                                 enum:
                                   - UNSPECIFIED
@@ -3900,7 +3891,6 @@ spec:
                                       type: object
                                     simple:
                                       description: |2-
-
 
                                         Valid Options: LEAST_CONN, RANDOM, PASSTHROUGH, ROUND_ROBIN, LEAST_REQUEST
                                       enum:
@@ -4347,7 +4337,6 @@ spec:
                         simple:
                           description: |2-
 
-
                             Valid Options: LEAST_CONN, RANDOM, PASSTHROUGH, ROUND_ROBIN, LEAST_REQUEST
                           enum:
                             - UNSPECIFIED
@@ -4662,7 +4651,6 @@ spec:
                                 type: object
                               simple:
                                 description: |2-
-
 
                                   Valid Options: LEAST_CONN, RANDOM, PASSTHROUGH, ROUND_ROBIN, LEAST_REQUEST
                                 enum:
