@@ -9,9 +9,19 @@ spec:
   gateways:
     - istio-system/ingress-gateway
   http:
+    # Redirect /longhorn to /longhorn/ (adding trailing slash)
     - match:
         - uri:
-            prefix: /longhorn
+            exact: /longhorn
+      redirect:
+        uri: /longhorn/
+        redirectCode: 301
+    # Rewrite /longhorn/something to /something before forwarding
+    - match:
+        - uri:
+            prefix: /longhorn/
+      rewrite:
+        uri: /
       route:
         - destination:
             host: longhorn-frontend.longhorn.svc.cluster.local
