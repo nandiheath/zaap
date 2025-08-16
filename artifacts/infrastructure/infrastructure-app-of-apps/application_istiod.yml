@@ -17,7 +17,6 @@ spec:
       jqPathExpressions:
         - .webhooks[].failurePolicy
       kind: ValidatingWebhookConfiguration
-      name: istiod-default-validator
   project: default
   revisionHistoryLimit: 10
   source:

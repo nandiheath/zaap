@@ -6,13 +6,13 @@
 - [ ] manage bootstrap/argocd with ArgoCD
 - [ ] add renovate
 - [ ] add prometheus (or other metrics scraper)
-
+- [ ] ArgoCD webhook
 
 ## Observability
 
-- [ ] add Grafana
+- [x] add Grafana
 - [ ] add Vector
-- [ ] add Prometheus
+- [x] add Prometheus
 - [ ] add Loki
 - [ ] enable api server audit log
 

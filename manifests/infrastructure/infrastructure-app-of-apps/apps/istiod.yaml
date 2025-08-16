@@ -13,6 +13,5 @@ spec:
     # https://github.com/istio/istio/issues/52785
     - group: admissionregistration.k8s.io
       kind: ValidatingWebhookConfiguration
-      name: istiod-default-validator
       jqPathExpressions:
         - .webhooks[].failurePolicy
