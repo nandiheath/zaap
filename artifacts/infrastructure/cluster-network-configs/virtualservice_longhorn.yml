@@ -12,7 +12,15 @@ spec:
   http:
     - match:
         - uri:
-            prefix: /longhorn
+            exact: /longhorn
+      redirect:
+        redirectCode: 301
+        uri: /longhorn/
+    - match:
+        - uri:
+            prefix: /longhorn/
+      rewrite:
+        uri: /
       route:
         - destination:
             host: longhorn-frontend.longhorn.svc.cluster.local
