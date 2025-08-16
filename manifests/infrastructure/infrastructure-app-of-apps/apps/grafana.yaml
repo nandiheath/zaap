@@ -1,0 +1,9 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: grafana
+spec:
+  source:
+    path: artifacts/infrastructure/grafana
+  destination:
+    namespace: grafana

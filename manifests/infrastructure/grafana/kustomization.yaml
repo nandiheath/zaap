@@ -1,0 +1,40 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - external-secret.yaml
+
+helmCharts:
+  - name: grafana
+    repo: https://grafana.github.io/helm-charts
+    releaseName: grafana
+    namespace: grafana
+    version: 9.3.1
+    valuesInline:
+      testFramework:
+        enabled: false
+
+      rbac:
+        namespaced: true
+      resources:
+        requests:
+          cpu: 500m
+      # load from external secret
+      admin:
+        existingSecret: grafana-credentials
+        userKey: username
+        passwordKey: password
+        
+      grafana.ini:
+        server:
+          domain: "zaap.nandi.sh"
+          root_url: "https://zaap.nandi.sh/grafana"
+          serve_from_sub_path: true
+
+      # persistent
+      persistence:
+        enabled: true
+        size: 10Gi
+        storageClassName: "local-path"
+        accessModes:
+          - ReadWriteOnce

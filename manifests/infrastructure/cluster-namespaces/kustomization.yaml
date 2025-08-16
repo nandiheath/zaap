@@ -9,3 +9,4 @@ resources:
   - namespace-external-secrets.yaml
   - namespace-cert-manager.yaml
   - namespace-cloudflared.yaml
+  - namespace-grafana.yaml
