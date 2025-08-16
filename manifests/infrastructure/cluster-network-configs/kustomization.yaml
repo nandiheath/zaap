@@ -6,3 +6,4 @@ resources:
   - virtualservice-prometheus.yaml
   - virtualservice-argocd.yaml
   - virtualservice-grafana.yaml
+  - virtualservice-longhorn.yaml
