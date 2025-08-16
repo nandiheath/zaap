@@ -1,8 +1,8 @@
 # Zaap
 
-![zaap-logo.png](zaap-logo.png)
+![zaap-logo.svg](zaap-logo.svg)
 
-Zaap(集) is a cloud-native setup for a home lab that provides a unified interface to manage various services and applications.
+Zaap(雥) is a cloud-native setup for a home lab that provides a unified interface to manage various services and applications.
 It is designed to be modular, allowing users to easily add or remove components as needed.
 This is an opinionated setup, meaning it comes with a set of pre-configured services and applications that can be easily deployed and managed.
 
@@ -13,18 +13,23 @@ which is a lightweight Kubernetes distribution designed for home labs and edge c
 
 ### Stack
 
-| Service                | Description |
-|------------------------|-------------|
-| ArgoCD                 | GitOps continuous delivery tool for Kubernetes |
-| External-Secrets       | Kubernetes controller for managing secrets from external sources |
-| 1password-Connect      | Connects Kubernetes to 1Password for secret management |
-| Istio                  | Service mesh providing traffic management, security, and observability |
-| Cert-Manager           | Kubernetes add-on to automate the management of TLS certificates |
-| Cilium                 | CNI for Kubernetes networking with advanced security features |
-| MetalLB                | Load balancer implementation for bare metal Kubernetes clusters |
-| Cloudflared            | Cloudflare Tunnel client for secure external access to the cluster |
-| Bootstrap              | Initial setup components for the cluster |
-| Network-Configs        | Network configuration resources like Gateways and VirtualServices |
+| Service           | Description                                                            |
+|-------------------|------------------------------------------------------------------------|
+| ArgoCD            | GitOps continuous delivery tool for Kubernetes                         |
+| External-Secrets  | Kubernetes controller for managing secrets from external sources       |
+| 1password-Connect | Connects Kubernetes to 1Password for secret management                 |
+| Istio             | Service mesh providing traffic management, security, and observability |
+| Cert-Manager      | Kubernetes add-on to automate the management of TLS certificates       |
+| Cilium            | CNI for Kubernetes networking with advanced security features          |
+| MetalLB           | Load balancer implementation for bare metal Kubernetes clusters        |
+| Cloudflared       | Cloudflare Tunnel client for secure external access to the cluster     |
+| Bootstrap         | Initial setup components for the cluster                               |
+| Network-Configs   | Network configuration resources like Gateways and VirtualServices      |
+| Prometheus        | Monitoring and alerting toolkit for Kubernetes                         |
+| Grafana           | Visualization and analytics platform for monitoring data               |
+| Loki [TODO]       | Log aggregation system for Kubernetes                                  |
+| Longhorn [TODO]  | Distributed block storage for Kubernetes clusters                     |
+| Immich [TODO]   | Self-hosted photo and video management system                          |
 
 ### Architecture
 
