@@ -4,4 +4,4 @@ kind: Namespace
 metadata:
   labels:
     istio.io/dataplane-mode: ambient
-  name: test-app
+  name: postgresql

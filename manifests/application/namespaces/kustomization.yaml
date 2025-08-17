@@ -5,6 +5,7 @@ resources:
   - namespace-test-app.yaml
   - namespace-immich.yaml
   - namespace-postgresql.yaml
+  - namespace-redis.yaml
 
 patches:
   - target:
