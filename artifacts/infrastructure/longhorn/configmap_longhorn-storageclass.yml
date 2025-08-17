@@ -7,13 +7,13 @@ data:
     metadata:
       name: longhorn
       annotations:
-        storageclass.kubernetes.io/is-default-class: "true"
+        storageclass.kubernetes.io/is-default-class: "false"
     provisioner: driver.longhorn.io
     allowVolumeExpansion: true
     reclaimPolicy: "Delete"
     volumeBindingMode: Immediate
     parameters:
-      numberOfReplicas: "3"
+      numberOfReplicas: "2"
       staleReplicaTimeout: "30"
       fromBackup: ""
       fsType: "ext4"
