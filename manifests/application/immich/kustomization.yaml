@@ -1,18 +1,48 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+# the helm chart is poorly configured
+namespace: immich
+
 resources:
   - pvc.yaml
+  - external-secret.yaml
+  - deployment_immich-machine-learning.yml
+  - deployment_immich-server.yml
+  - service_immich-machine-learning.yml
+  - service_immich-server.yml
+  - postgres-cluster.yaml
 
-helmCharts:
-  - name: immich
-    repo: oci://ghcr.io/immich-app/immich-charts
-    releaseName: immich
-    namespace: immich
-    version: 0.9.3
-    valuesInline:
-      immich:
-        persistence:
-          library:
-            existingClaim: immich-library
-      
+labels:
+  - pairs:
+      app.kubernetes.io/instance: immich
+      app.kubernetes.io/managed-by: kustomize
+      app.kubernetes.io/version: v1.119.0
+
+images:
+  - name: immich-machine-learning
+    newName: ghcr.io/immich-app/immich-machine-learning
+    newTag: v1.119.0
+  - name: immich-server
+    newName: ghcr.io/immich-app/immich-server
+    newTag: v1.119.0
+
+# N.B. The helm chart is not a standard Helm Chart - it doesn't support secrets overriding the default env-vars
+# Although it might still work, but for consistency reason I prefer to use pure kustomize for now.
+# Also the upstream chart uses a library chart for its manifests - I couldn't find myself liking it.
+# Keep things simple and elegant - so just stick with raw manifests w/ kustomize.
+# 
+#helmCharts:
+#  - name: immich
+#    repo: oci://ghcr.io/immich-app/immich-charts
+#    releaseName: immich
+#    namespace: immich
+#    version: 0.9.3
+#    valuesInline:
+#      immich:
+#        persistence:
+#          library:
+#            existingClaim: immich-library
+#      redis:
+#        enabled: true
+

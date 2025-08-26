@@ -1,0 +1,38 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  annotations:
+    traffic.sidecar.istio.io/includeInboundPorts: "5432"
+  labels:
+    app.kubernetes.io/instance: immich
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/version: v1.119.0
+  name: immich-db
+  namespace: immich
+spec:
+  bootstrap:
+    initdb:
+      database: immich
+      owner: immich
+      postInitSQL:
+        - CREATE EXTENSION IF NOT EXISTS "vectors";
+        - CREATE EXTENSION IF NOT EXISTS "cube" CASCADE;
+        - CREATE EXTENSION IF NOT EXISTS "earthdistance" CASCADE;
+      secret:
+        name: postgresql-credentials-immich
+  imageName: ghcr.io/tensorchord/cloudnative-pgvecto.rs:16.5-v0.3.0
+  instances: 1
+  managed:
+    roles:
+      - login: true
+        name: immich
+        passwordSecret:
+          name: postgresql-credentials-immich
+        superuser: true
+  postgresql:
+    shared_preload_libraries:
+      - vectors.so
+  storage:
+    size: 10Gi
+    storageClass: longhorn

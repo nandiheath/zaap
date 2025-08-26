@@ -8,7 +8,6 @@ resources:
   - apps/test-app.yaml
   - apps/network-configs.yaml
   - apps/immich.yaml
-  - apps/postgresql.yaml
   - apps/redis.yaml
 patches:
   - path: base-application.yaml
