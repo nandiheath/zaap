@@ -3,3 +3,4 @@ kind: Kustomization
 
 resources:
   - virtualservice-testapp.yaml
+  - virtualservice-immich.yaml

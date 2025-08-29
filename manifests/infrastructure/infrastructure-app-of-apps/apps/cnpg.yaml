@@ -1,0 +1,10 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cnpg
+  annotations:
+    # Not core component. Install at the end
+    argocd.argoproj.io/sync-wave: "5"
+spec:
+  source:
+    path: artifacts/infrastructure/cnpg

@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Now we set up a generic Redis instance for all applications that need it.
+# However we might want to use a more advanced Redis setup in the future, such as Redis Cluster or Sentinel.
+# Or do per-application Redis instances if that makes more sense.
+# IT should be noted that we should treat Redis as a throwaway cache, and not as a persistent data store, and never store sensitive data in it.
+helmCharts:
+  - name: redis
+    repo: oci://registry-1.docker.io/bitnamicharts
+    releaseName: redis
+    namespace: redis
+    version: 22.0.3
+    valuesInline:
+      # disable auth
+      auth:
+        enabled: false        
+      persistence:
+        enabled: false
+      # instead of replication, we use a standalone instance for simplicity
+      architecture: standalone
+
+# add istio.io/dataplane-mode=none to the label

@@ -1,0 +1,103 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: immich
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: server
+    app.kubernetes.io/version: v1.119.0
+    helm.sh/chart: immich-0.9.3
+  name: immich-server
+  namespace: immich
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: immich
+      app.kubernetes.io/name: server
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        traffic.sidecar.istio.io/excludeOutboundPorts: "5432,6379"
+      labels:
+        app.kubernetes.io/instance: immich
+        app.kubernetes.io/name: server
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - env:
+            - name: IMMICH_LOG_LEVEL
+              value: debug
+            - name: DB_DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-credentials-immich
+                  key: database
+            - name: DB_HOSTNAME
+              value: immich-rw
+            - name: DB_SSL_MODE
+              value: disable
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-credentials-immich
+                  key: password
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-credentials-immich
+                  key: username
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-credentials-immich
+                  key: connectionURL
+            - name: IMMICH_MACHINE_LEARNING_URL
+              value: http://immich-machine-learning:3003
+            - name: REDIS_HOSTNAME
+              value: redis-master.redis.svc.cluster.local
+          image: immich-server
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/server/ping
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+          name: immich-server
+          ports:
+            - containerPort: 2283
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/server/ping
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+          startupProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /api/server/ping
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+          volumeMounts:
+            - mountPath: /usr/src/app/upload
+              name: library
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      serviceAccountName: default
+      volumes:
+        - name: library
+          persistentVolumeClaim:
+            claimName: immich-library

@@ -1,0 +1,42 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: immich-db
+  namespace: immich
+  annotations:
+    traffic.sidecar.istio.io/excludeInboundPorts: "5432"
+    istio.io/dataplane-mode: none
+spec:
+  # At the time of writing, immich is only compatible with pgvecto.rs <0.4. Latest postgres image with that version is 16.5.
+  imageName: ghcr.io/tensorchord/cloudnative-pgvecto.rs:16.5-v0.3.0
+  # A bug was reported in v0.3.0, which does not allow a replicated setup:
+  # https://github.com/immich-app/immich-charts/issues/149#issuecomment-2559012759
+  instances: 1
+
+  postgresql:
+    shared_preload_libraries:
+      - "vectors.so"
+
+  managed:
+    roles:
+      - name: immich
+        superuser: true
+        login: true
+        passwordSecret:
+          name: postgresql-credentials-immich
+
+  bootstrap:
+    initdb:
+      database: immich
+      owner: immich
+      secret:
+        name: postgresql-credentials-immich
+      postInitSQL:
+        - CREATE EXTENSION IF NOT EXISTS "vectors";
+        - CREATE EXTENSION IF NOT EXISTS "cube" CASCADE;
+        - CREATE EXTENSION IF NOT EXISTS "earthdistance" CASCADE;
+
+  storage:
+    size: 10Gi
+    storageClass: longhorn
+  

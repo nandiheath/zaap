@@ -21,6 +21,7 @@ resources:
   - apps/application-app-of-apps.yaml
   - apps/grafana.yaml
   - apps/longhorn.yaml
+  - apps/cnpg.yaml
 
 patches:
   - path: base-application.yaml
