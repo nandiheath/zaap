@@ -21,6 +21,8 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      annotations:
+        traffic.sidecar.istio.io/excludeOutboundPorts: "5432,6379"
       labels:
         app.kubernetes.io/instance: immich
         app.kubernetes.io/name: server
@@ -29,14 +31,16 @@ spec:
       containers:
         - env:
             - name: IMMICH_LOG_LEVEL
-              value: verbose
+              value: debug
             - name: DB_DATABASE_NAME
               valueFrom:
                 secretKeyRef:
                   name: postgresql-credentials-immich
                   key: database
             - name: DB_HOSTNAME
-              value: immich-db-rw
+              value: immich-rw
+            - name: DB_SSL_MODE
+              value: disable
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -47,6 +51,11 @@ spec:
                 secretKeyRef:
                   name: postgresql-credentials-immich
                   key: username
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-credentials-immich
+                  key: connectionURL
             - name: IMMICH_MACHINE_LEARNING_URL
               value: http://immich-machine-learning:3003
             - name: REDIS_HOSTNAME

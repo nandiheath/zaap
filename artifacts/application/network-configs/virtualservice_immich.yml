@@ -4,10 +4,10 @@ metadata:
   name: immich
   namespace: immich
 spec:
-  hosts:
-    - "immich.nandi.sh"
   gateways:
     - istio-system/ingress-gateway
+  hosts:
+    - immich.nandi.sh
   http:
     - route:
         - destination:

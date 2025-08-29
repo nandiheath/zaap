@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cnpg-controller-manager-config
+  namespace: cnpg-system
+data:
+  # allow inherit istio related annotations
+  INHERITED_ANNOTATIONS: traffic.sidecar.istio.io/*
+  INHERITED_LABELS: istio.io/*
+  

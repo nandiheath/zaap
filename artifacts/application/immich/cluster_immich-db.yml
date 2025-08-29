@@ -3,7 +3,8 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   annotations:
-    traffic.sidecar.istio.io/includeInboundPorts: "5432"
+    istio.io/dataplane-mode: none
+    traffic.sidecar.istio.io/excludeInboundPorts: "5432"
   labels:
     app.kubernetes.io/instance: immich
     app.kubernetes.io/managed-by: kustomize

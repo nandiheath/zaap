@@ -19,3 +19,5 @@ helmCharts:
         enabled: false
       # instead of replication, we use a standalone instance for simplicity
       architecture: standalone
+
+# add istio.io/dataplane-mode=none to the label
