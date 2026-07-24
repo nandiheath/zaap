@@ -1,0 +1,67 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "dependencyDashboard": true,
+  "labels": ["dependencies"],
+  "automerge": false,
+  "platformAutomerge": false,
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "minimumReleaseAge": "7 days",
+  "schedule": ["before 5am on Monday"],
+  "timezone": "UTC",
+  "rangeStrategy": "pin",
+  "ignorePaths": ["artifacts/**", "credentials/**"],
+  "kubernetes": {
+    "managerFilePatterns": ["/(^|/)manifests/.+\\.ya?ml$/"]
+  },
+  "kustomize": {
+    "managerFilePatterns": ["/(^|/)manifests/.+/kustomization\\.ya?ml$/"]
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^manifests\\/infrastructure\\/metallb\\/kustomization\\.yaml$/"],
+      "matchStrings": ["https://raw\\.githubusercontent\\.com/metallb/metallb/(?<currentValue>v[^/]+)/config/manifests/metallb-native\\.yaml"],
+      "depNameTemplate": "metallb/metallb",
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^manifests\\/infrastructure\\/cnpg\\/kustomization\\.yaml$/"],
+      "matchStrings": ["https://raw\\.githubusercontent\\.com/cloudnative-pg/cloudnative-pg/release-\\d+\\.\\d+/releases/cnpg-(?<currentValue>\\d+\\.\\d+\\.\\d+)\\.yaml"],
+      "depNameTemplate": "cloudnative-pg/cloudnative-pg",
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "semver"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Pin container updates to immutable digests",
+      "matchDatasources": ["docker"],
+      "pinDigests": true
+    },
+    {
+      "description": "Require an explicit migration review for major updates",
+      "matchUpdateTypes": ["major"],
+      "addLabels": ["major-update", "requires-migration"]
+    },
+    {
+      "description": "Give cluster-critical releases a longer observation window",
+      "matchFileNames": ["manifests/infrastructure/**"],
+      "minimumReleaseAge": "14 days",
+      "addLabels": ["cluster-critical"]
+    },
+    {
+      "description": "Group immutable GitHub Actions updates",
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions"
+    },
+    {
+      "description": "Keep CNPG automated updates on the declared release branch",
+      "matchPackageNames": ["cloudnative-pg/cloudnative-pg"],
+      "allowedVersions": "/^1\\.27\\./"
+    }
+  ]
+}

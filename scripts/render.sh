@@ -9,12 +9,7 @@
 # - Falls back to processing all applications if git history is not available
 # - Supports both infrastructure and application manifests
 
-# Enable debug output in CI environment
-if [[ "${CI:-}" == "true" ]]; then
-  set -x
-fi
-
-set -oeu pipefail
+set -Eeuo pipefail
 
 # Default to infrastructure if not specified
 MANIFEST_TYPE="infrastructure"
@@ -23,6 +18,7 @@ TMP_MANIFESTS_ROOT="$(mktemp -d "/tmp/manifests.XXXXXX")"
 
 dir_path=$(dirname "${BASH_SOURCE[0]}")
 
+# shellcheck source=scripts/lib.sh
 source "$dir_path/lib.sh"
 
 function show_help() {
@@ -97,29 +93,56 @@ else
   manifests_list=$(changed_files "manifests/${MANIFEST_TYPE}")
 fi
 
-# Load environment variables from config/.env if it exists
-# In CI environments, .env file might not be present
-ENV_VARS_TO_SUBST=""
+SUBSTITUTION_VARIABLES=(
+  ARGOCD_GITHUB_REPO
+  ARGOCD_GITHUB_ORG
+  VAULT
+  ARGOCD_ADMIN_GITHUB_USER
+)
+
 if [[ -f "$dir_path/../config/.env" ]]; then
-  echo "Loading environment variables from config/.env"
+  echo "Loading non-secret identifiers from config/.env"
   set -a
+  # shellcheck source=/dev/null
   source "$dir_path/../config/.env"
   set +a
-  
-  # Extract variable names from .env file and format them for envsubst
-  # This will ignore comments and empty lines
-  ENV_VARS_TO_SUBST=$(grep -v '^#' "$dir_path/../config/.env" | grep -v '^$' | sed -E 's/([^=]+)=.*/\${\1}/g' | tr '\n' ' ')
-  echo "Will only substitute the following environment variables: $ENV_VARS_TO_SUBST"
-else
-  echo "Warning: config/.env file not found, continuing without it"
 fi
+
+for variable in "${SUBSTITUTION_VARIABLES[@]}"; do
+  if [[ -z "${!variable:-}" ]]; then
+    echo "Error: required render variable $variable is unset or empty." >&2
+    exit 1
+  fi
+done
+
+printf 'Will substitute only:'
+for variable in "${SUBSTITUTION_VARIABLES[@]}"; do printf ' %s' "\${${variable}}"; done
+printf '\n'
 
 interpolate_manifests() {
   local src_dir="$1"
   local dst_dir="$2"
+  local src_file
+  local rel_path
+  local dst_file
+  local content
+  local variable
+  local placeholder
+
   echo "Interpolating environment variables in manifests from $src_dir to $dst_dir"
-  # Use envsubst to replace only the environment variables defined in .env
-  find "$src_dir" -type f \( -name "*.yaml" -o -name "*.yml" -o -name "*.json" \) -exec sh -c 'rel_path="${1#"$2"/}"; dst="$3/$rel_path"; mkdir -p "$(dirname "$dst")"; envsubst "$4" < "$1" > "$dst"' _ {} "$src_dir" "$dst_dir" "$ENV_VARS_TO_SUBST" \;  
+  while IFS= read -r -d '' src_file; do
+    rel_path="${src_file#"$src_dir"/}"
+    dst_file="$dst_dir/$rel_path"
+    mkdir -p "$(dirname "$dst_file")"
+    content=$(<"$src_file")
+    for variable in "${SUBSTITUTION_VARIABLES[@]}"; do
+      placeholder="\${${variable}}"
+      content="${content//"$placeholder"/"${!variable}"}"
+      placeholder="\$${variable}"
+      content="${content//"$placeholder"/"${!variable}"}"
+    done
+    printf '%s\n' "$content" > "$dst_file"
+  done < <(find "$src_dir" -type f \( -name "*.yaml" -o -name "*.yml" -o -name "*.json" \) -print0)
 }
 
 cleanup_tmp_manifests() {
@@ -129,7 +152,8 @@ trap cleanup_tmp_manifests EXIT
 
 create_tmp_subdir() {
   local manifests="$1"
-  local subdir="$TMP_MANIFESTS_ROOT/$(basename "$manifests")"
+  local subdir
+  subdir="$TMP_MANIFESTS_ROOT/$(basename "$manifests")"
   mkdir -p "$subdir"
   echo "$subdir"
 }
@@ -142,30 +166,26 @@ for manifests in $manifests_list ; do
   # Extract the app name from the manifest path (last part of the path)
   app_name=$(basename "$manifests")
   output_path="$RENDER_DIR/$app_name"
+  rm -rf "$output_path"
   mkdir -p "$output_path"
-  rm -rf $output_path/*  # Clear previous output
   
-  # Check if kustomize is available
   if ! command -v kustomize &> /dev/null; then
-    echo "Error: kustomize command not found. Please install kustomize." >&2
-    echo "Skipping kustomize build for $tmp_manifests"
-    continue
+    echo "Error: kustomize command not found. Install the pinned Hermit toolchain first." >&2
+    exit 1
   fi
-  
-  # Check if yq is available
+
   if ! command -v yq &> /dev/null; then
-    echo "Error: yq command not found. Please install yq." >&2
-    echo "Skipping manifest rendering for $tmp_manifests"
-    continue
+    echo "Error: yq command not found. Install the pinned Hermit toolchain first." >&2
+    exit 1
   fi
-  
-  # Run kustomize and yq with error handling
+
   if ! kustomize_output=$(kustomize build --enable-helm "$tmp_manifests" 2>&1); then
-    echo "Warning: kustomize build failed for $tmp_manifests: $kustomize_output" >&2
-    continue
+    echo "Error: kustomize build failed for $tmp_manifests: $kustomize_output" >&2
+    exit 1
   fi
-  
-  echo "$kustomize_output" | yq -s '"'"$output_path/"'" + (.kind | downcase) + "_" + (.metadata.name | sub("\.","-"))' || {
-    echo "Warning: yq processing failed for $tmp_manifests" >&2
-  }
+
+  if ! printf '%s\n' "$kustomize_output" | yq -s '"'"$output_path/"'" + (.kind | downcase) + "_" + (.metadata.name | sub("\.","-"))'; then
+    echo "Error: yq processing failed for $tmp_manifests" >&2
+    exit 1
+  fi
 done

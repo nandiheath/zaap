@@ -89,7 +89,6 @@ if [ -z "${DESCRIPTION:-}" ]; then
 fi
 
 # Create directories
-BASE_DIR="manifests/${APP_TYPE}"
 SRC_DIR="manifests/${APP_TYPE}/${APP_NAME}"
 RENDERED_DIR="artifacts/${APP_TYPE}/${APP_NAME}"
 APP_OF_APPS_DIR="manifests/${APP_TYPE}/${APP_TYPE}-app-of-apps"

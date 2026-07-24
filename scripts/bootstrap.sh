@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 set -e
@@ -44,31 +43,34 @@ wait_for_pods_ready() {
   
   print_info "Waiting for pods in namespace '$namespace' to be ready (timeout: ${timeout}s)..."
   
-  local end_time=$(($(date +%s) + timeout))
-  
-  while [ $(date +%s) -lt $end_time ]; do
+  local end_time
+  local pods_status
+  local containers_ready
+  end_time=$(($(date +%s) + timeout))
+
+  while [ "$(date +%s)" -lt "$end_time" ]; do
     # Get all pods in the namespace
-    local pods_status=$(kubectl get pods -n "$namespace" -o jsonpath='{.items[*].status.phase}' 2>/dev/null)
-    local containers_ready=$(kubectl get pods -n "$namespace" -o jsonpath='{.items[*].status.containerStatuses[*].ready}' 2>/dev/null)
+    pods_status=$(kubectl get pods -n "$namespace" -o jsonpath='{.items[*].status.phase}' 2>/dev/null)
+    containers_ready=$(kubectl get pods -n "$namespace" -o jsonpath='{.items[*].status.containerStatuses[*].ready}' 2>/dev/null)
     
     # If no pods found yet, wait and try again
     if [ -z "$pods_status" ]; then
       print_info "No pods found in namespace '$namespace' yet. Waiting..."
-      sleep $interval
+      sleep "$interval"
       continue
     fi
     
     # Check if any pods are not Running
     if [[ "$pods_status" == *"Pending"* ]] || [[ "$pods_status" == *"Failed"* ]] || [[ "$pods_status" == *"Unknown"* ]]; then
       print_info "Some pods in namespace '$namespace' are not running yet. Waiting..."
-      sleep $interval
+      sleep "$interval"
       continue
     fi
     
     # Check if all containers are ready
     if [[ "$containers_ready" == *"false"* ]]; then
       print_info "Some containers in namespace '$namespace' are not ready yet. Waiting..."
-      sleep $interval
+      sleep "$interval"
       continue
     fi
     

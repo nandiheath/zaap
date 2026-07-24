@@ -45,66 +45,54 @@ The Zaap stack uses several key components working together:
 ![network-diagram.png](network-diagram.png)
 
 
-### Prerequisites & Important Notes
+## Requirements
 
-> ⚠️ **Critical Setup Requirements**
->
-> Before proceeding with Zaap installation, ensure your environment meets these prerequisites:
+- A Kubernetes cluster without kube-proxy or flannel; [zaap-k3s](https://github.com/nandiheath/zaap-k3s) is the reference distribution.
+- Cilium configured as the CNI and Istio configured for ambient mode.
+- A 1Password account and Connect credentials for secret management.
+- A Cloudflare account when the tunnel ingress is enabled.
+- `kubectl` access is required only for bootstrap, recovery, and operator diagnostics.
 
-#### Kubernetes Cluster
-- **Base Cluster**: A functioning Kubernetes cluster is required
-  - **Recommended**: [zaap-k3s](https://github.com/nandiheath/zaap-k3s) for optimal compatibility
-  - This lightweight distribution is specifically designed for home labs and edge computing
+Actionlint, Helm, Kustomize, ShellCheck, `yq`, and Kubeconform are pinned through Hermit and do not need system-wide installation.
 
-#### Network Configuration
-- **CNI Requirements**: 
-  - Kubernetes cluster must be configured **without** kube-proxy and flannel
-  - Cilium will be used as the CNI provider instead
-  - [📚 K3s Configuration Guide](https://docs.cilium.io/en/v1.12/gettingstarted/k3s/#getting-started-using-k3s)
+## Setup and validation
 
-#### Service Mesh
-- **Istio & Cilium Integration**: 
-  - This setup uses Istio compatibility with Cilium in ambient mode
-  - Proper configuration is essential for networking functionality
-  - [📚 Integration Guide](https://docs.cilium.io/en/latest/network/servicemesh/istio/)
+1. Clone the repository and activate the toolchain:
 
-### Getting Started
-
-1. Clone this repository:
    ```bash
    git clone https://github.com/nandiheath/zaap.git
    cd zaap
+   source bin/activate-hermit
    ```
 
-2. Create and configure the environment file:
+2. Configure `config/.env`. It may contain identifiers only:
+
+   ```dotenv
+   ARGOCD_GITHUB_REPO=https://github.com/nandiheath/zaap.git
+   ARGOCD_GITHUB_ORG=https://github.com/nandiheath
+   VAULT=example-vault-name
+   ARGOCD_ADMIN_GITHUB_USER=operator@example.com
+   ```
+
+   Never add tokens, passwords, 1Password credentials, or cluster credentials to this file. GitHub Actions does not need these values as secrets because the tracked file supplies non-secret render inputs.
+
+3. Render and validate the complete desired state:
+
    ```bash
-   # Create .env file if it doesn't exist
-   touch config/.env
-   
-   # Edit the .env file with required variables:
-   # - ARGOCD_GITHUB_REPO: The repository URL for the Zaap project
-   # - ARGOCD_GITHUB_ORG: The GitHub organization or user URL
-   # - VAULT: The 1Password vault name used to store secrets
+   ./scripts/validate.sh
+   git diff --exit-code -- artifacts/
    ```
 
-3. Generate the Kubernetes manifests:
-   ```bash
-   # Generate all manifests
-   ./scripts/render.sh --all
-   
-   # Or generate manifests for a specific application
-   ./scripts/render.sh --app <application-name>
-   ```
+4. Review the target `kubectl` context, then run the bootstrap script from a trusted operator workstation. Bootstrap installs the minimum resources required for Argo CD and External Secrets. Argo CD performs subsequent continuous delivery from `main`.
 
-4. Apply the generated manifests to your Kubernetes cluster using ArgoCD or kubectl.
+## Continuous delivery
 
-You should also create corresponding environment variables on your Github repository to match the `.env` file.
-This allows the CI steps to access the necessary secrets and configurations for generating the manifests and deploying them to your Kubernetes cluster.
+Pull requests run a credentialless, read-only GitHub Actions workflow that renders all source manifests, validates known Kubernetes schemas, and fails when committed artifacts are stale. The workflow never calls `kubectl` or an Argo CD API.
 
-## Requirements
+Protect `main` with the `Validate desired state / Render and validate` status check, disallow force pushes, include administrators, and require reviewed pull requests. Argo CD is configured to pull reviewed `main` revisions and reconcile them with prune and self-heal enabled.
 
-- A Kubernetes cluster (recommended: [zaap-k3s](https://github.com/nandiheath/zaap-k3s))
-- kubectl and kustomize installed
-- yq installed for manifest processing
-- 1Password account for secret management
-- Cloudflare account for external access (if using cloudflared)
+## Automated dependency updates
+
+Install the [Renovate GitHub App](https://github.com/apps/renovate) for this repository to activate `renovate.json`. Renovate discovers Kustomize Helm charts, Kubernetes container images, GitHub Actions, MetalLB, and patch-level CloudNativePG releases. Updates wait at least seven days, cluster-critical updates wait fourteen days, images are digest-pinned, and automerge is disabled.
+
+Because Argo CD consumes committed `artifacts/`, update branches must run `./scripts/validate.sh` and commit the regenerated artifact changes before merge. Major and persistent-data updates require the migration and recovery evidence declared by their task.

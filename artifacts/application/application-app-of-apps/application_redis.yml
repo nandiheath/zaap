@@ -4,10 +4,11 @@ kind: Application
 metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
-  name: namespaces
+  name: redis
   namespace: argocd
 spec:
   destination:
+    namespace: redis
     server: https://kubernetes.default.svc
   project: default
   revisionHistoryLimit: 10
@@ -15,7 +16,7 @@ spec:
     directory:
       include: '{*.yaml,*.yml}'
       recurse: true
-    path: artifacts/application/namespaces
+    path: artifacts/application/redis
     repoURL: https://github.com/nandiheath/zaap
     targetRevision: main
   syncPolicy:

@@ -1,62 +1,36 @@
-# This is a basic workflow to help you get started with Actions
+name: Validate desired state
 
-name: CI
-
-# Controls when the workflow will run
 on:
+  pull_request:
   push:
-    branches-ignore:
-      main
+    branches:
+      - main
+  workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  # This workflow contains a single job called "build"
-  render-manifests:
-    # The type of runner that the job will run on
+  validate:
+    name: Render and validate
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    timeout-minutes: 20
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
-          # Number of commits to fetch. 0 indicates all history for all branches and tags.
-          # We need to fetch all history to compare the file changed
-          # TODO: may leverage a GHA to get the changed files?
           fetch-depth: 0
-      # Activate Hermit
-      - uses: cashapp/activate-hermit@v1
-        with:
-          cache: "true"
-      # Runs a set of commands using the runners shell
-      - name: Run render script
-        run: ./scripts/render.sh
+          persist-credentials: false
 
-      - name: Check for changes
-        id: git-check
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add .
-          if git diff --staged --quiet; then
-            echo "No changes detected"
-            echo "changes=false" >> $GITHUB_OUTPUT
-          else
-            echo "Changes detected"
-            echo "changes=true" >> $GITHUB_OUTPUT
-          fi
+      - name: Activate pinned Hermit toolchain
+        uses: cashapp/activate-hermit@cea9af7913204a965fd488637a8d1811bba2e616 # v1
 
-      - name: Commit changes
-        if: steps.git-check.outputs.changes == 'true'
-        run: |
-          git commit -m "[no ci] chore: render manifests"
+      - name: Render and validate manifests
+        run: ./scripts/validate.sh
 
-      - name: Push changes
-        if: steps.git-check.outputs.changes == 'true'
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
-          
-      - name: Status check
-        run: echo "Render workflow completed successfully"
+      - name: Verify generated artifacts are current
+        run: git diff --exit-code -- artifacts/
