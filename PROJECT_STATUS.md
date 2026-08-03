@@ -23,7 +23,7 @@ GitHub Actions must remain credentialless with respect to Kubernetes. Argo CD is
 ## Active repository controls
 
 - GitHub reports the repository as archived. Pull-request metadata and merges remain read-only until the owner explicitly unarchives it.
-- `main` requires the strict `Validate desired state / Render and validate` check, one approving review, stale-review dismissal, conversation resolution, linear history, and administrator enforcement. Force pushes and deletions are disallowed.
+- `main` requires the expected `Validate desired state / Render and validate` context, one approving review, stale-review dismissal, conversation resolution, linear history, and administrator enforcement. Branch deletion is disallowed; force pushes are currently allowed. The required context has no runnable validation workflow on current `main`, so protection is presently deadlocked until that workflow is restored or the rule is corrected.
 - GitHub Actions defaults to read-only tokens, cannot approve pull requests, permits only GitHub-owned actions, and requires full commit-SHA action pins.
 - Secret scanning, push protection, and Dependabot security updates are enabled. The repository contains identifiers only; workload credentials remain in 1Password and reach the cluster through External Secrets.
 
