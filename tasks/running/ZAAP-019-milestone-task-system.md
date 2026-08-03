@@ -1,7 +1,8 @@
 # ZAAP-019: Adopt milestone-based task planning
 
-- **Status:** running
+- **Status:** ready-for-rollup
 - **Owner:** Main
+- **Milestone:** ZAAP-M002
 - **Depends on:** none
 - **Risk:** low
 
@@ -23,9 +24,9 @@ Adopt the canonical milestone-first planning lifecycle while preserving generate
 
 ## Acceptance criteria
 
-- [ ] Repository guidance defines milestone-first planning and completion gates.
-- [ ] Task and milestone templates are present under `tasks/`.
-- [ ] Existing planned tasks reference milestones.
+- [x] Repository guidance defines milestone-first planning and completion gates.
+- [x] Task and milestone templates are present under `tasks/`.
+- [x] Existing planned tasks reference milestones.
 
 ## Verification
 
@@ -42,8 +43,8 @@ None.
 
 ## Completion handoff
 
-- **Summary:** pending
-- **Files changed:** pending
-- **Observed verification:** pending
+- **Summary:** Added milestone-first planning, templates, child-task references, and rollup gates while preserving production and generated-artifact policy.
+- **Files changed:** `AGENTS.md`, `tasks/README.md`, task templates and metadata, and milestone contracts under `tasks/milestones/`.
+- **Observed verification:** `agent-workspace repo-tasks validate --root .` passed; `./scripts/validate.sh` rendered 409 resources with 283 valid, 0 invalid, 0 errors, and 126 skipped schemas.
 - **Rollback/recovery:** not applicable
 - **Follow-ups:** none
