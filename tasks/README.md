@@ -19,7 +19,7 @@ A task changing `manifests/<layer>/<component>/` also owns `artifacts/<layer>/<c
 
 ## Completion and milestone gate
 
-Implementation agents run focused proof, fill their handoff, and set `ready-for-rollup`. The serial rollup owner merges child tasks one at a time, checks them off in the milestone, and runs `./scripts/validate.sh`.
+Implementation agents run focused proof, fill their handoff, and set `ready-for-rollup`. The serial rollup owner merges child tasks one at a time, checks them off in the milestone, runs the milestone's repository-specific verification, and validates lifecycle structure with `agent-workspace repo-tasks validate --root .`.
 
 A milestone becomes `ready-for-rollup` only when every child task is rolled up and checked, no active child still references it, every milestone acceptance and rollback/security invariant is observed, and the milestone verification scenario passes. The owner records evidence, updates `PROJECT_STATUS.md`, and removes the completed milestone. Failed proof remains active or blocked.
 

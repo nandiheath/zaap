@@ -19,7 +19,7 @@ Close the repository's confirmed reproducibility, data protection, security-boun
 
 ## Verification
 
-- Scenario or command: run `./scripts/validate.sh`, verify generated artifacts are stable, and execute the milestone's authorized disposable-cluster recovery scenarios.
+- Scenario or command: run `source bin/activate-hermit && ./scripts/render.sh`, verify generated artifacts are stable, and execute the milestone's authorized disposable-cluster recovery scenarios.
 - Expected observation: desired state is reproducible, security invariants hold, and recovery evidence is observed without CI deployment credentials.
 
 ## Blockers

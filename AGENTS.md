@@ -46,16 +46,17 @@ manifests/ -> scripts/render.sh -> artifacts/ -> protected main -> Argo CD -> cl
 
 ## Verification
 
-For manifest, render, or dependency changes:
+For planning-contract changes, run:
+
+```bash
+agent-workspace repo-tasks validate --root .
+```
+
+For manifest or dependency changes, activate Hermit, run the existing renderer, and review the exact generated artifact subtree:
 
 ```bash
 source bin/activate-hermit
-./scripts/validate.sh
-```
-
-The rollup owner additionally verifies generated artifacts are committed:
-
-```bash
+./scripts/render.sh
 git diff --exit-code -- artifacts/
 ```
 
